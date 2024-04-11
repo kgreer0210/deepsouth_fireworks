@@ -22,6 +22,9 @@ export default async function Home() {
     <div className="flex h-screen">
       <Sidebar />
       <div className="flex flex-1 flex-col">
+        <div>
+          <h1>Overview section</h1>
+        </div>
         <div className="flex-1 p-8">
           <DataTable columns={columns} data={data} />
         </div>
