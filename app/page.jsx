@@ -2,8 +2,8 @@ import { columns } from "@/app/inventory/columns";
 import { DataTable } from "@/app/inventory/data-table";
 import { createClient } from "@/app/utils/supabase/server";
 import Sidebar from "@/components/sidebar";
-import SignoutButton from "@/components/ui/signOutButton";
 import { redirect } from "next/navigation";
+import { getInventory } from "./data/inventoryData";
 
 //async function to validate user is logged in
 async function validateUser() {
@@ -14,21 +14,9 @@ async function validateUser() {
   }
 }
 
-async function getData() {
-  const supabase = createClient();
-  const { data: inventory, error } = await supabase
-    .from("inventory")
-    .select("*");
-  if (error) {
-    console.error("Error fetching inventory data:", error);
-    return [];
-  }
-  return inventory;
-}
-
 export default async function Home() {
   await validateUser();
-  const data = await getData();
+  const data = await getInventory();
 
   return (
     <div className="flex h-screen">

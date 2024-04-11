@@ -17,14 +17,14 @@ export default function Sidebar() {
           <li className="mb-2 p-2 hover:bg-gray-700 rounded">Team</li>
         </ul>
       </div>
-      <div>
-        <div className="flex-row p-4">
-          <Avatar>
-            <AvatarImage src="/Kyle-17.jpg" />
-            <AvatarFallback>KG</AvatarFallback>
-          </Avatar>
-          <h3 className="text-lg font-semibold flex">Kyle Greer</h3>
-          <p className="flex">Admin</p>
+      <div className="flex items-center space-x-4 p-4">
+        <Avatar>
+          <AvatarImage src="/Kyle-17.jpg" />
+          <AvatarFallback>KG</AvatarFallback>
+        </Avatar>
+        <div>
+          <h3 className="text-lg font-semibold">Kyle Greer</h3>
+          <p className="text-sm text-gray-400">Admin</p>
         </div>
       </div>
     </div>

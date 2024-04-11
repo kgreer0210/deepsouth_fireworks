@@ -1,8 +1,8 @@
 // ShowsPage.js
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Sidebar from "@/components/sidebar";
-import Shows from "./showCard";
-import { getShows } from "./showData";
+import Shows from "./showComponents/showCard";
+import { getShows } from "../data/showData";
 
 export default async function ShowsPage() {
   const currentDate = new Date();
