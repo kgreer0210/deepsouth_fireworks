@@ -26,7 +26,7 @@ export default async function Home() {
           <h1>Overview section</h1>
         </div>
         <div className="flex-1 p-8">
-          <DataTable columns={columns} data={data} />
+          <DataTable columns={columns} data={data} isMainPage={true} />
         </div>
       </div>
     </div>

@@ -97,11 +97,13 @@ export const columns = [
     header: "Container",
   },
   {
+    accessorKey: "duration",
+    header: "Duration",
+  },
+  {
     id: "actions",
     header: "Actions",
-    cell: ({ row }) => {
-      const payment = row.original;
-
+    cell: () => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -112,13 +114,8 @@ export const columns = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(payment.id)}
-            >
-              Edit Item
-            </DropdownMenuItem>
+            <DropdownMenuItem>Edit Item</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View Assigned Shows</DropdownMenuItem>
             <DropdownMenuItem className="text-red-600">
               Delete Item
             </DropdownMenuItem>
