@@ -6,7 +6,8 @@ export async function getInventory() {
 
   const { data: inventory, error } = await supabase
     .from("inventory")
-    .select("*");
+    .select("*")
+    .gte("quantity", 1);
   if (error) {
     console.error("Error fetching inventory:", error);
     return [];
