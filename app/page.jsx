@@ -4,6 +4,7 @@ import { createClient } from "@/app/utils/supabase/server";
 import Sidebar from "@/components/sidebar";
 import { redirect } from "next/navigation";
 import { getInventory } from "./data/inventoryData";
+import Overview from "@/components/overview/overview";
 //async function to validate user is logged in
 async function validateUser() {
   const supabase = createClient();
@@ -21,8 +22,10 @@ export default async function Home() {
     <div className="flex h-screen">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-y-auto">
-        <div className="p-4">
-          <h1 className="text-2xl font-bold">Overview section</h1>
+        <h1 className="text-2xl text-center font-bold mt-4">Inventory</h1>
+
+        <div className="flex justify-center p-4">
+          <Overview data={data} />
         </div>
         <div className="flex-1 p-4">
           <DataTable columns={columns} data={data} isMainPage={true} />
