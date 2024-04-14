@@ -23,6 +23,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/app/utils/supabase/client";
+import NewItemForm from "./newItemForm";
 
 const formSchema = z.object({
   barcode: z.string().min(1, {
@@ -31,20 +33,58 @@ const formSchema = z.object({
 });
 
 export default function AddNewInventoryItem() {
+  const [showNewItemForm, setShowNewItemForm] = React.useState(false);
+  const [barcodeValue, setBarcodeValue] = React.useState("");
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       barcode: "",
     },
   });
-  function onSubmit(values) {
-    // Do something with the form values.
-    console.log(values);
-    form.reset({ barcode: "" });
+  const supabase = createClient();
+
+  async function validateBarcode(barcode) {
+    try {
+      const { data, error } = await supabase
+        .from("inventory")
+        .select()
+        .eq("barcode", barcode);
+
+      if (error) {
+        console.error("Error validating barcode:", error);
+        return false;
+      }
+
+      return data.length > 0; // Return true if barcode exists in the database
+    } catch (error) {
+      console.error("Error validating barcode:", error);
+      return false;
+    }
+  }
+  async function onSubmit(values) {
+    const barcodeExists = await validateBarcode(values.barcode);
+
+    if (!barcodeExists) {
+      setBarcodeValue(values.barcode);
+      setShowNewItemForm(true); // Update the state variable to show the form
+      form.reset({ barcode: "" });
+    } else {
+      // Barcode exists, proceed with your form submission logic
+      console.log("Barcode exists:", values.barcode);
+      form.reset({ barcode: "" });
+    }
   }
 
   return (
     <div>
+      {showNewItemForm && (
+        <NewItemForm
+          open={true}
+          setOpen={setShowNewItemForm}
+          barcodeValue={barcodeValue}
+        />
+      )}
       <Dialog>
         <DialogTrigger className="bg-primary text-primary-foreground h-10 px-4 py-2 rounded-lg">
           Add Inventory Item
