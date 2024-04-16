@@ -2,7 +2,6 @@
 import { DataTable } from "@/app/inventory/data-table";
 import { columns } from "@/app/inventory/columns";
 import { createClient } from "@/app/utils/supabase/client";
-import Sidebar from "@/components/sidebar";
 import IndiviualShowHeader from "@/app/shows/showComponents/individualShowHeader";
 import { getInventory } from "@/app/data/inventoryData";
 
@@ -30,17 +29,13 @@ export default async function ShowPage({ params }) {
   }
 
   return (
-    <div className="flex h-screen">
-      <Sidebar />
-      <div className="flex-1 overflow-auto">
-        <div className="container mx-auto py-8">
-          <IndiviualShowHeader show={show} />
-          <div className="py-8">
-            <div className="">
-              <DataTable columns={columns} data={inventory} />
-            </div>
-          </div>
-        </div>
+    <div className="flex flex-1 flex-col overflow-y-auto">
+      <h1 className="text-2xl text-center font-bold mt-4">Inventory</h1>
+      <div className="flex justify-center p-4">
+        <IndiviualShowHeader show={show} />
+      </div>
+      <div className="flex-1 p-4">
+        <DataTable columns={columns} data={inventory} />
       </div>
     </div>
   );

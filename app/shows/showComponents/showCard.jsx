@@ -21,13 +21,13 @@ export default function Shows({ shows, currentDate, type }) {
   });
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+    <div className="container mx-auto py-2">
+      <div className="flex flex-wrap justify-center gap-8">
         {filteredShows.map((show) => (
           <Link key={show.show_id} href={`/shows/${show.show_id}`}>
-            <Card className="h-full cursor-pointer">
+            <Card className="h-full w-60 cursor-pointer">
               <CardHeader>
-                <CardTitle>{show.name}</CardTitle>
+                <CardTitle className="truncate ...">{show.name}</CardTitle>
               </CardHeader>
               <CardContent className="flex-grow">
                 <CardDescription>{show.date_of_show}</CardDescription>

@@ -1,5 +1,6 @@
 import { Roboto as FontSans } from "next/font/google";
 import "./globals.css";
+import Sidebar from "@/components/sidebar";
 
 import { cn } from "@/lib/utils";
 
@@ -23,7 +24,10 @@ export default function RootLayout({ children }) {
           fontSans.variable
         )}
       >
-        {children}
+        <div className="flex h-screen">
+          <Sidebar />
+          {children}
+        </div>
       </body>
     </html>
   );
