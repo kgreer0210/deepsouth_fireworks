@@ -10,7 +10,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import { redirect } from "next/navigation";
+import Link from "next/link";
 const filterByNameOrCategory = (row, columnId, value, addMeta) => {
   const searchQuery = value.toLowerCase();
   const nameMatches = row.getValue("name").toLowerCase().includes(searchQuery);
@@ -103,7 +104,8 @@ export const columns = [
   {
     id: "actions",
     header: "Actions",
-    cell: () => {
+    cell: ({ row }) => {
+      const rowId = row.original;
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -114,7 +116,11 @@ export const columns = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Edit Item</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={`/inventory/item/${rowId.inventory_id}`}>
+                Edit Item
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-red-600">
               Delete Item
