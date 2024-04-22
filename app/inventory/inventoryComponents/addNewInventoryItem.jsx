@@ -25,6 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/app/utils/supabase/client";
 import NewItemForm from "./newItemForm";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   barcode: z.string().min(1, {
@@ -33,6 +34,7 @@ const formSchema = z.object({
 });
 
 export default function AddNewInventoryItem() {
+  const router = useRouter();
   const [showNewItemForm, setShowNewItemForm] = React.useState(false);
   const [barcodeValue, setBarcodeValue] = React.useState("");
 
@@ -70,8 +72,30 @@ export default function AddNewInventoryItem() {
       setShowNewItemForm(true); // Update the state variable to show the form
       form.reset({ barcode: "" });
     } else {
-      // Barcode exists, proceed with your form submission logic
-      console.log("Barcode exists:", values.barcode);
+      try {
+        const { data, error } = await supabase
+          .from("inventory")
+          .select("inventory_id")
+          .eq("barcode", values.barcode)
+          .single(); // Assuming barcode is unique and you want only one result
+
+        if (error) {
+          console.error("Error fetching item details:", error);
+          // Handle error, maybe show a message to the user
+          return;
+        }
+
+        if (data) {
+          const itemId = data.inventory_id;
+          router.push(`/inventory/item/${itemId}`); // Redirect to the item page
+        } else {
+          console.error("Item not found for barcode:", values.barcode);
+          // Handle case where item is not found, maybe show a message to the user
+        }
+      } catch (error) {
+        console.error("Error redirecting to item page:", error);
+        // Handle error, maybe show a message to the user
+      }
       form.reset({ barcode: "" });
     }
   }

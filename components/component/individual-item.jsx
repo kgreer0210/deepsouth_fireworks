@@ -35,55 +35,55 @@ export function IndividualItem({
           <div className="grid grid-cols-2 gap-x-8 gap-y-4">
             <div>
               <Label htmlFor="name">Name</Label>
-              <Input id="name" value={nameOfItem} />
+              <Input id="name" defaultValue={nameOfItem} />
             </div>
             <div>
               <Label htmlFor="category">Category</Label>
-              <Input id="category" value={category} />
+              <Input id="category" defaultValue={category} />
             </div>
             <div>
               <Label htmlFor="quantity">Quantity</Label>
-              <Input id="quantity" value={quantity} />
+              <Input id="quantity" defaultValue={quantity} />
             </div>
             <div>
               <Label htmlFor="price">Price</Label>
-              <Input id="price" value={price} />
+              <Input id="price" defaultValue={price} />
             </div>
             <div>
               <Label htmlFor="case_weight">Case Weight</Label>
-              <Input id="case_weight" value={case_weight} />
+              <Input id="case_weight" defaultValue={case_weight} />
             </div>
             <div>
               <Label htmlFor="items_per_case">Items Per Case</Label>
-              <Input id="items_per_case" value={items_per_case} />
+              <Input id="items_per_case" defaultValue={items_per_case} />
             </div>
             <div>
               <Label htmlFor="video_url">Video URL</Label>
-              <Input id="video_url" value={video_url} />
+              <Input id="video_url" defaultValue={video_url} />
             </div>
             <div>
               <Label htmlFor="barcode">Barcode</Label>
-              <Input id="barcode" value={barcode} />
+              <Input id="barcode" defaultValue={barcode} />
             </div>
             <div>
               <Label htmlFor="ex_number">EX Number</Label>
-              <Input id="ex_number" value={ex_number} />
+              <Input id="ex_number" defaultValue={ex_number} />
             </div>
             <div>
               <Label htmlFor="notes">Notes</Label>
-              <Input id="notes" value={notes} />
+              <Input id="notes" defaultValue={notes} />
             </div>
             <div>
               <Label htmlFor="size">Size</Label>
-              <Input id="size" value={size} />
+              <Input id="size" defaultValue={size} />
             </div>
             <div>
               <Label htmlFor="duration">Duration</Label>
-              <Input id="duration" value={duration} />
+              <Input id="duration" defaultValue={duration} />
             </div>
             <div>
               <Label htmlFor="container">Container</Label>
-              <Input id="container" value={container} />
+              <Input id="container" defaultValue={container} />
             </div>
           </div>
         </CardContent>
