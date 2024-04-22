@@ -9,7 +9,6 @@ import {
   getUsedYtdQuantity,
   getUsedYtdValue,
 } from "../../app/data/overviewData";
-import { Value } from "@radix-ui/react-select";
 
 export default function Overview() {
   const [totalQuantity, setTotalQuantity] = useState(0);

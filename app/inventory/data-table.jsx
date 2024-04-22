@@ -125,7 +125,6 @@ export function DataTable({ columns, data, isMainPage = false }) {
           Next
         </Button>
       </div>
-      {/* Render the ScanBarcodeModal component with isOpen and onClose props */}
     </div>
   );
 }
