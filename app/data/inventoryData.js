@@ -1,4 +1,4 @@
-// showData.js
+// inventoryData.js
 import { createClient } from "@/app/utils/supabase/client";
 
 export async function getInventory() {
@@ -13,4 +13,18 @@ export async function getInventory() {
     return [];
   }
   return inventory;
+}
+
+export async function deleteInventory(id) {
+  const supabase = createClient();
+
+  const { error } = await supabase
+    .from("inventory")
+    .delete()
+    .eq("inventory_id", id);
+
+  if (error) {
+    console.error("Error deleting inventory item:", error);
+    return;
+  }
 }

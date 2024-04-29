@@ -10,8 +10,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { redirect } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 import Link from "next/link";
+import { deleteInventory } from "../data/inventoryData";
 const filterByNameOrCategory = (row, columnId, value, addMeta) => {
   const searchQuery = value.toLowerCase();
   const nameMatches = row.getValue("name").toLowerCase().includes(searchQuery);
@@ -106,6 +118,9 @@ export const columns = [
     header: "Actions",
     cell: ({ row }) => {
       const rowId = row.original;
+      const deleteItem = async () => {
+        await deleteInventory(rowId.inventory_id);
+      };
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -122,9 +137,26 @@ export const columns = [
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-600">
-              Delete Item
-            </DropdownMenuItem>
+            <AlertDialog>
+              <AlertDialogTrigger className="text-red-500 text-sm m-1">
+                Delete Item
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete
+                    this item from the server.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={deleteItem}>
+                    Continue
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </DropdownMenuContent>
         </DropdownMenu>
       );

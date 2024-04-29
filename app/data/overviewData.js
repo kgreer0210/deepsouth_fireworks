@@ -1,5 +1,3 @@
-"use client";
-
 import { createClient } from "@/app/utils/supabase/client";
 
 const supabase = createClient();
@@ -82,22 +80,5 @@ export async function getUsedYtdValue() {
   } catch (error) {
     console.error("Error fetching used ytd value:", error);
     return 0; // Return 0 in case of an error
-  }
-}
-
-export async function getLowStockItems() {
-  try {
-    const { data, error } = await supabase
-      .from("inventory")
-      .select("quantity")
-      .lte("quantity", 10);
-    if (error) {
-      console.error("Error fetching low stock items:", error);
-      return []; // Return an empty array in case of an error
-    }
-    return data;
-  } catch (error) {
-    console.error("Error fetching low stock items:", error);
-    return []; // Return an empty array in case of an error
   }
 }
