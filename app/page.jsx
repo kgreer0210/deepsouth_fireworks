@@ -7,9 +7,17 @@ import {
   getUsedYtdQuantity,
   getUsedYtdValue,
 } from "@/app/data/overviewData";
+import { logout } from "@/app/logout/actions";
 import Overview from "@/app/inventory/overview/overview";
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
+  const supabase = createClient();
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data.user) {
+    redirect("/login");
+  }
   const inventoryData = await getInventory();
   const totalInventoryQtyData = await getTotalInventoryQuantity();
   const totalInventoryValueData = await getTotalInventoryValue();
@@ -29,6 +37,9 @@ export default async function Home() {
       <div className="flex-1 p-4">
         <DataTable columns={columns} data={inventoryData} isMainPage={true} />
       </div>
+      <form action={logout}>
+        <button type="submit">Sign Out</button>
+      </form>
     </div>
   );
 }

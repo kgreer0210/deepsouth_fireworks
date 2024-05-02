@@ -2,7 +2,8 @@ import { CardTitle, CardHeader, CardContent, Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { Button } from "../ui/button";
+import { Button } from "../../../components/ui/button";
+import { redirect } from "next/navigation";
 
 export function IndividualItem({
   nameOfItem,
@@ -89,7 +90,9 @@ export function IndividualItem({
         </CardContent>
       </Card>
       <div className="flex justify-end mt-4 flex-cols-2 gap-2">
-        <Button variant="outline">Cancel</Button>
+        <Link href="/">
+          <Button variant="outline">Cancel</Button>
+        </Link>
         <Button>Save</Button>
       </div>
     </div>

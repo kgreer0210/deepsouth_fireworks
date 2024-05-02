@@ -1,4 +1,4 @@
-import { createClient } from "@/app/utils/supabase/client";
+import { createClient } from "@/utils/supabase/client";
 
 const supabase = createClient();
 export async function getTotalInventoryQuantity() {

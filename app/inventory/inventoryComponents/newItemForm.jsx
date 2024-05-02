@@ -8,7 +8,7 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import { createClient } from "@/app/utils/supabase/client";
+import { createClient } from "@/utils/supabase/client";
 const NewItemForm = ({ open, setOpen, barcodeValue }) => {
   const [name, setName] = React.useState("");
   const [category, setCategory] = React.useState("");

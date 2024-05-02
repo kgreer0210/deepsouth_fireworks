@@ -1,8 +1,13 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { createClient } from "@/utils/supabase/server";
 
-export default function Sidebar() {
+export default async function Sidebar() {
+  const supabase = createClient();
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data.user) {
+    return null;
+  }
   return (
     <div className="flex flex-col w-64 h-screen bg-gray-800 text-white p-6 justify-between">
       <div>

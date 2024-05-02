@@ -1,7 +1,6 @@
 import { Roboto as FontSans } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/sidebar";
-
 import { cn } from "@/lib/utils";
 
 const fontSans = FontSans({
@@ -14,8 +13,7 @@ export const metadata = {
   title: "Deep South Fireworks",
   description: "Deep South Fireworks Inventory Management System",
 };
-
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body

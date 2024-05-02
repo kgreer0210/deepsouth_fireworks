@@ -1,5 +1,5 @@
-import { createClient } from "@/app/utils/supabase/client";
-import { IndividualItem } from "@/components/component/individual-item";
+import { createClient } from "@/utils/supabase/client";
+import { IndividualItem } from "@/app/inventory/item/individual-item";
 
 async function getIndividualInventory(id) {
   const supabase = createClient();

@@ -1,7 +1,7 @@
 // app/shows/[id]/page.js
 import { DataTable } from "@/app/inventory/data-table";
 import { columns } from "@/app/inventory/columns";
-import { createClient } from "@/app/utils/supabase/client";
+import { createClient } from "@/utils/supabase/client";
 import IndiviualShowHeader from "@/app/shows/showComponents/individualShowHeader";
 import { getInventory } from "@/app/data/inventoryData";
 
