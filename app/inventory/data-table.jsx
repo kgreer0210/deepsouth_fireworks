@@ -21,8 +21,11 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import { MixerHorizontalIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import AddNewInventoryItem from "./inventoryComponents/addNewInventoryItem";
 import { Input } from "@/components/ui/input";
@@ -58,23 +61,36 @@ export function DataTable({ columns, data, isMainPage = false }) {
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              className="ml-auto hidden h-8 lg:flex"
+            >
+              <MixerHorizontalIcon className="mr-2 h-4 w-4" />
               Show/Hide Columns
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="w-[150px]">
+            <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+            <DropdownMenuSeparator />
             {table
               .getAllColumns()
-              .filter((column) => column.getCanHide())
+              .filter(
+                (column) =>
+                  typeof column.accessorFn !== "undefined" &&
+                  column.getCanHide()
+              )
               .map((column) => {
                 return (
                   <DropdownMenuCheckboxItem
                     key={column.id}
                     className="capitalize"
                     checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
+                    // Prevent the dropdown from closing on item selection
+                    onCheckedChange={(value) => {
+                      column.toggleVisibility(!!value);
+                      // Don't close the dropdown
+                    }}
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
