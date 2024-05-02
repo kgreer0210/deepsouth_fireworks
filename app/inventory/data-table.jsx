@@ -2,8 +2,6 @@
 import * as React from "react";
 
 import {
-  ColumnFiltersState,
-  SortingState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -19,6 +17,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import AddNewInventoryItem from "./inventoryComponents/addNewInventoryItem";
 import { Input } from "@/components/ui/input";
@@ -26,6 +30,7 @@ import { Input } from "@/components/ui/input";
 export function DataTable({ columns, data, isMainPage = false }) {
   const [sorting, setSorting] = React.useState();
   const [columnFilters, setColumnFilters] = React.useState();
+  const [columnVisibility, setColumnVisibility] = React.useState({});
   const table = useReactTable({
     data,
     columns,
@@ -35,7 +40,8 @@ export function DataTable({ columns, data, isMainPage = false }) {
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
-    state: { sorting, columnFilters },
+    onColumnVisibilityChange: setColumnVisibility,
+    state: { sorting, columnFilters, columnVisibility },
   });
 
   return (
@@ -50,6 +56,32 @@ export function DataTable({ columns, data, isMainPage = false }) {
           }}
           className="max-w-sm mr-2"
         />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-auto">
+              Show/Hide Columns
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
         <div className="flex-grow"></div>
         {isMainPage && <AddNewInventoryItem />}
       </div>
