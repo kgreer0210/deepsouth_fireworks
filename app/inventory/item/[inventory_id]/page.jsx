@@ -31,6 +31,7 @@ export default async function IndividualItemPage({ params }) {
         videoUrl={item[0].video_url}
         exNumber={item[0].ex_number}
         size={item[0].size}
+        id={item[0].inventory_id}
       />
     </div>
   );
