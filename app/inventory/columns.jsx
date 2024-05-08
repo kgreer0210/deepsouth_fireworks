@@ -167,7 +167,7 @@ export const columns = [
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <AlertDialog>
+            {/* <AlertDialog>
               <AlertDialogTrigger className="text-red-500 text-sm m-1">
                 Delete Item
               </AlertDialogTrigger>
@@ -186,7 +186,7 @@ export const columns = [
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
-            </AlertDialog>
+            </AlertDialog> */}
           </DropdownMenuContent>
         </DropdownMenu>
       );
