@@ -8,58 +8,81 @@ import {
   TextField,
   Button,
 } from "@mui/material";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { createClient } from "@/utils/supabase/client";
+
+// Define the validation schema using zod
+const formSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  category: z.string().min(1, "Category is required"),
+  quantity: z.number().min(1, "Quantity must be at least 1"),
+  price: z
+    .string()
+    .regex(
+      /^\d+(\.\d{1,2})?$/,
+      "Price must be a valid number with up to two decimal places"
+    ),
+  caseWeight: z.number().min(1, "Case Weight must be at least 1"),
+  itemsPerCase: z.number().min(1, "Items Per Case must be at least 1"),
+  duration: z.string().regex(/^\d+$/, "Duration must be a valid number"),
+  container: z.string().min(1, "Container is required"),
+  barcode: z.string().min(1, "Barcode is required"),
+});
+
 const NewItemForm = ({ open, setOpen, barcodeValue }) => {
-  const [name, setName] = React.useState("");
-  const [category, setCategory] = React.useState("");
-  const [quantity, setQuantity] = React.useState("");
-  const [price, setPrice] = React.useState("");
-  const [caseWeight, setCaseWeight] = React.useState("");
-  const [itemsPerCase, setItemsPerCase] = React.useState("");
-  const [duration, setDuration] = React.useState("");
-  const [container, setContainer] = React.useState("");
-
   const supabase = createClient();
+
+  // Integrate react-hook-form with zod validation schema
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(formSchema),
+  });
+
   const handleClose = () => setOpen(false);
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Add new item to Supabase
 
-    const { data, error } = supabase
-      .from("inventory")
-      .insert([
-        {
-          name: name,
-          barcode: barcodeValue,
-          category: category,
-          quantity: quantity,
-          price: price,
-          case_weight: caseWeight,
-          items_per_case: itemsPerCase,
-          duration: duration,
-          container: container,
-        },
-      ])
-      .select()
-      .then(() => {
-        alert("Item added to inventory");
-      });
+  const onSubmit = async (data) => {
+    const { error } = await supabase.from("inventory").insert([
+      {
+        name: data.name,
+        barcode: data.barcode,
+        category: data.category,
+        quantity: data.quantity,
+        price: parseFloat(data.price),
+        case_weight: data.caseWeight,
+        items_per_case: data.itemsPerCase,
+        duration: `${data.duration} Sec`,
+        container: data.container,
+      },
+    ]);
 
+    if (error) {
+      console.error("Error adding item to inventory:", error);
+    } else {
+      alert("Item added to inventory");
+    }
     handleClose();
   };
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <DialogTitle align={"center"}>Add New Item</DialogTitle>
         <DialogContent>
           <TextField
             margin="normal"
             id="barcode"
-            label="barcode"
+            label="Barcode"
             type="text"
             fullWidth
-            value={barcodeValue}
+            defaultValue={barcodeValue}
+            {...register("barcode")}
+            error={!!errors.barcode}
+            helperText={errors.barcode?.message}
           />
           <TextField
             autoFocus
@@ -68,8 +91,9 @@ const NewItemForm = ({ open, setOpen, barcodeValue }) => {
             label="Name"
             type="text"
             fullWidth
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            {...register("name")}
+            error={!!errors.name}
+            helperText={errors.name?.message}
           />
           <TextField
             margin="normal"
@@ -77,17 +101,20 @@ const NewItemForm = ({ open, setOpen, barcodeValue }) => {
             label="Category"
             type="text"
             fullWidth
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            {...register("category")}
+            error={!!errors.category}
+            helperText={errors.category?.message}
           />
           <TextField
             margin="normal"
             id="quantity"
             label="Quantity"
-            type="text"
+            type="number"
+            defaultValue={0}
             fullWidth
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
+            {...register("quantity", { valueAsNumber: true })}
+            error={!!errors.quantity}
+            helperText={errors.quantity?.message}
           />
           <TextField
             margin="normal"
@@ -95,35 +122,41 @@ const NewItemForm = ({ open, setOpen, barcodeValue }) => {
             label="Price"
             type="text"
             fullWidth
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
+            {...register("price")}
+            error={!!errors.price}
+            helperText={errors.price?.message}
           />
           <TextField
             margin="normal"
             id="caseWeight"
             label="Case Weight"
-            type="text"
+            type="number"
+            defaultValue={0}
             fullWidth
-            value={caseWeight}
-            onChange={(e) => setCaseWeight(e.target.value)}
+            {...register("caseWeight", { valueAsNumber: true })}
+            error={!!errors.caseWeight}
+            helperText={errors.caseWeight?.message}
           />
           <TextField
             margin="normal"
             id="itemsPerCase"
             label="Items Per Case"
-            type="text"
+            type="number"
+            defaultValue={0}
             fullWidth
-            value={itemsPerCase}
-            onChange={(e) => setItemsPerCase(e.target.value)}
+            {...register("itemsPerCase", { valueAsNumber: true })}
+            error={!!errors.itemsPerCase}
+            helperText={errors.itemsPerCase?.message}
           />
           <TextField
             margin="normal"
             id="duration"
-            label="Duration"
+            label="Duration (Sec)"
             type="text"
             fullWidth
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
+            {...register("duration")}
+            error={!!errors.duration}
+            helperText={errors.duration?.message}
           />
           <TextField
             margin="normal"
@@ -131,8 +164,9 @@ const NewItemForm = ({ open, setOpen, barcodeValue }) => {
             label="Container"
             type="text"
             fullWidth
-            value={container}
-            onChange={(e) => setContainer(e.target.value)}
+            {...register("container")}
+            error={!!errors.container}
+            helperText={errors.container?.message}
           />
         </DialogContent>
         <DialogActions>
