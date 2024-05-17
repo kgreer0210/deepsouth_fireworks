@@ -44,6 +44,7 @@ const NewItemForm = ({ open, setOpen, barcodeValue }) => {
       .then(() => {
         alert("Item added to inventory");
       });
+
     handleClose();
   };
 

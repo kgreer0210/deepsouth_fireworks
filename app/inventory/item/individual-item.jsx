@@ -49,7 +49,6 @@ export async function IndividualItem({ item }) {
   return (
     <form action={editItem}>
       <div className="max-w-4xl mx-auto p-6">
-        {console.log(item)}
         <div className="flex items-center space-x-2 mb-6">
           <Link href="/">
             <ArrowLeftIcon className="h-5 w-5 text-muted-foreground" />
