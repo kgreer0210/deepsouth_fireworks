@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-const filterFunction = (row, value) => {
+const filterFunction = (row, columnId, value) => {
   const name = row.getValue("name")?.toLowerCase() ?? "";
   const category = row.getValue("category")?.toLowerCase() ?? "";
   const duration = row.getValue("duration")?.toLowerCase() ?? "";

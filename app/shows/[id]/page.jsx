@@ -1,8 +1,9 @@
 // app/shows/[id]/page.js
 import IndiviualShowHeader from "@/app/shows/showComponents/individualShowHeader";
 import { getShowSummary } from "@/app/data/showSummary";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/utils/supabase/server";
 import { getShowInventoryDetails } from "@/app/data/detailedShowInventory";
+import { getInventory } from "@/app/data/inventoryData";
 
 async function getShow(id) {
   const supabase = createClient();
@@ -23,7 +24,7 @@ export default async function ShowPage({ params }) {
   const show = await getShow(params.id);
   const showSummary = await getShowSummary(params.id);
   const showInventory = await getShowInventoryDetails(params.id);
-
+  const inventoryData = await getInventory();
   if (!show) {
     return <div>Show not found</div>;
   }
@@ -36,6 +37,7 @@ export default async function ShowPage({ params }) {
           show={show}
           initialShowSummary={showSummary}
           showInventory={showInventory}
+          inventoryData={inventoryData}
         />
       </div>
     </div>

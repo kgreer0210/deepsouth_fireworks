@@ -22,11 +22,12 @@ export default function IndiviualShowHeader({
   show,
   initialShowSummary,
   showInventory,
+  inventoryData,
 }) {
   const [showSummary, setShowSummary] = useState(initialShowSummary);
   const [showInventoryDetails, setShowInventoryDetails] =
     useState(showInventory);
-  const [currentInventoryData, setInventoryData] = useState();
+  const [currentInventoryData, setInventoryData] = useState(inventoryData);
 
   useEffect(() => {
     const showId = show.show_id;
@@ -186,7 +187,7 @@ export default function IndiviualShowHeader({
             <DialogTrigger asChild>
               <Button variant="outline">Add Item to Show</Button>
             </DialogTrigger>
-            <DialogContent className="max-w-[80vw]">
+            <DialogContent className="max-w-[90vw]">
               <DialogHeader>
                 <DialogTitle>Add Items to Show</DialogTitle>
                 <DialogDescription>
