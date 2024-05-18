@@ -1,5 +1,5 @@
 // app/shows/[id]/page.js
-import IndiviualShowHeader from "@/app/shows/showComponents/individualShowHeader";
+import IndiviualShow from "@/app/shows/showComponents/individualShow";
 import { getShowSummary } from "@/app/data/showSummary";
 import { createClient } from "@/utils/supabase/server";
 import { getShowInventoryDetails } from "@/app/data/detailedShowInventory";
@@ -33,7 +33,7 @@ export default async function ShowPage({ params }) {
     <div className="flex flex-1 flex-col overflow-y-auto">
       <h1 className="text-2xl text-center font-bold mt-4">Inventory</h1>
       <div className="justify-center p-4">
-        <IndiviualShowHeader
+        <IndiviualShow
           show={show}
           initialShowSummary={showSummary}
           showInventory={showInventory}

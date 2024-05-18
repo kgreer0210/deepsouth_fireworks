@@ -47,9 +47,23 @@ export function useRealTimeShows() {
       )
       .subscribe();
 
+    const deleteChannel = supabase
+      .channel("schema-db-changes-delete")
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "shows" },
+        (payload) => {
+          setShows((prevShows) =>
+            prevShows.filter((show) => show.show_id !== payload.old.show_id)
+          );
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(insertChannel);
       supabase.removeChannel(updateChannel);
+      supabase.removeChannel(deleteChannel);
     };
   }, []);
 

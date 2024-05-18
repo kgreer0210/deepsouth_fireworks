@@ -1,3 +1,5 @@
+// individualShow.jsx
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -18,7 +20,7 @@ import { showInventoryColumns } from "./selectShowInventoryColumns";
 
 const supabase = createClient();
 
-export default function IndiviualShowHeader({
+export default function IndiviualShow({
   show,
   initialShowSummary,
   showInventory,
