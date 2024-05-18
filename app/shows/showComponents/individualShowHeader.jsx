@@ -4,6 +4,17 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { ShowInventoryDataTable } from "./selectShowInventoryDataTable";
+import { showInventoryColumns } from "./selectShowInventoryColumns";
 
 const supabase = createClient();
 
@@ -15,9 +26,22 @@ export default function IndiviualShowHeader({
   const [showSummary, setShowSummary] = useState(initialShowSummary);
   const [showInventoryDetails, setShowInventoryDetails] =
     useState(showInventory);
+  const [currentInventoryData, setInventoryData] = useState();
 
   useEffect(() => {
     const showId = show.show_id;
+
+    const fetchInventory = async () => {
+      const { data, error } = await supabase
+        .from("inventory")
+        .select("*")
+        .gte("quantity", 1);
+      if (error) {
+        console.error("Error fetching inventory:", error);
+      } else {
+        setInventoryData(data);
+      }
+    };
 
     const fetchShowSummary = async () => {
       const { data, error } = await supabase
@@ -76,6 +100,7 @@ export default function IndiviualShowHeader({
 
     fetchShowSummary();
     fetchShowInventory();
+    fetchInventory();
 
     return () => {
       supabase.removeChannel(inventoryChannel);
@@ -92,7 +117,7 @@ export default function IndiviualShowHeader({
         </h2>
         <div className="w-[30%] max-w-72 m-4">
           <p>
-            ${showSummary.total_cost > 0 ? showSummary[0].total_cost : 0} of $
+            ${showSummary.length > 0 ? showSummary[0].total_cost : 0} of $
             {showSummary.length > 0 ? showSummary[0].budget : 0} has been used
           </p>
           <Progress
@@ -109,7 +134,7 @@ export default function IndiviualShowHeader({
         </div>
       </div>
       <div className="mb-6">
-        <div className="flex justify-between mt-2">
+        <div className="flex justify-center mt-2">
           {showInventoryDetails.length > 0 ? (
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -151,10 +176,30 @@ export default function IndiviualShowHeader({
               </tbody>
             </table>
           ) : (
-            <div className="text-center w-full text-xl text-gray-500">
+            <p className="text-center text-xl text-gray-500">
               There are no items assigned to this show
-            </div>
+            </p>
           )}
+        </div>
+        <div className="flex justify-center mt-2">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Add Item to Show</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-[80vw]">
+              <DialogHeader>
+                <DialogTitle>Add Items to Show</DialogTitle>
+                <DialogDescription>
+                  Please select the fireworks you would like to add to this
+                  show.
+                </DialogDescription>
+              </DialogHeader>
+              <ShowInventoryDataTable
+                columns={showInventoryColumns}
+                data={currentInventoryData}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>

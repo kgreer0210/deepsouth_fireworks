@@ -10,36 +10,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 
 import Link from "next/link";
 import { deleteInventory } from "../data/inventoryData";
-const filterByNameOrCategory = (row, columnId, value, addMeta) => {
-  const searchQuery = value.toLowerCase();
-  const nameMatches = row.getValue("name").toLowerCase().includes(searchQuery);
-  const categoryMatches = row
-    .getValue("category")
-    .toLowerCase()
-    .includes(searchQuery);
-
-  const passed = nameMatches || categoryMatches;
-
-  addMeta({
-    passed,
-  });
-
-  return passed;
-};
 
 export const columns = [
   {
@@ -55,7 +28,6 @@ export const columns = [
         </Button>
       );
     },
-    filterFn: filterByNameOrCategory,
   },
   {
     accessorKey: "quantity",
@@ -87,7 +59,6 @@ export const columns = [
   {
     accessorKey: "category",
     header: "Category",
-    filterFn: filterByNameOrCategory,
   },
   // case_weight
   {

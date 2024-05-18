@@ -16,48 +16,35 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
-import { MixerHorizontalIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
-import AddNewInventoryItem from "./inventoryComponents/addNewInventoryItem";
 import { Input } from "@/components/ui/input";
 
-// Custom filter function to search across multiple columns
-const filterFunction = (row, columnId, filterValue) => {
+const filterFunction = (row, value) => {
   const name = row.getValue("name")?.toLowerCase() ?? "";
   const category = row.getValue("category")?.toLowerCase() ?? "";
   const duration = row.getValue("duration")?.toLowerCase() ?? "";
-  const filterValueLower = filterValue.toLowerCase();
+  const filterValue = value.toLowerCase();
   return (
-    name.includes(filterValueLower) ||
-    category.includes(filterValueLower) ||
-    duration.includes(filterValueLower)
+    name.includes(filterValue) ||
+    category.includes(filterValue) ||
+    duration.includes(filterValue)
   );
 };
 
-export function DataTable({ columns, data, isMainPage = false }) {
-  const [sorting, setSorting] = React.useState([]);
+export function ShowInventoryDataTable({ columns, data }) {
   const [globalFilter, setGlobalFilter] = React.useState("");
-  const [columnVisibility, setColumnVisibility] = React.useState({});
 
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, globalFilter, columnVisibility },
+    state: {
+      globalFilter,
+    },
+    globalFilterFn: filterFunction,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onSortingChange: setSorting,
-    onColumnVisibilityChange: setColumnVisibility,
-    globalFilterFn: filterFunction,
   });
 
   return (
@@ -69,45 +56,6 @@ export function DataTable({ columns, data, isMainPage = false }) {
           onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm mr-2"
         />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="ml-auto hidden h-8 lg:flex"
-            >
-              <MixerHorizontalIcon className="mr-2 h-4 w-4" />
-              Show/Hide Columns
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-[150px]">
-            <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {table
-              .getAllColumns()
-              .filter(
-                (column) =>
-                  typeof column.accessorFn !== "undefined" &&
-                  column.getCanHide()
-              )
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) => {
-                      column.toggleVisibility(!!value);
-                    }}
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <div className="flex-grow"></div>
-        {isMainPage && <AddNewInventoryItem />}
       </div>
 
       <div className="rounded-md border overflow-x-auto">
@@ -163,7 +111,11 @@ export function DataTable({ columns, data, isMainPage = false }) {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
+      <div className="flex items-center justify-between space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
+        </div>
         <Button
           variant="outline"
           size="sm"

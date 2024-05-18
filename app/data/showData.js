@@ -1,5 +1,4 @@
-// showData.js
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/utils/supabase/server";
 
 export async function getShows() {
   const supabase = createClient();
@@ -9,5 +8,6 @@ export async function getShows() {
     console.error("Error fetching shows:", error);
     return [];
   }
+
   return shows;
 }
