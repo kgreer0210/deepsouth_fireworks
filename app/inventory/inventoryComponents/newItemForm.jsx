@@ -1,13 +1,26 @@
 "use client";
 import * as React from "react";
 import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
   Dialog,
-  DialogActions,
   DialogContent,
+  DialogDescription,
+  DialogHeader,
   DialogTitle,
-  TextField,
-  Button,
-} from "@mui/material";
+  DialogTrigger,
+  DialogClose,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -34,13 +47,19 @@ const formSchema = z.object({
 const NewItemForm = ({ open, setOpen, barcodeValue }) => {
   const supabase = createClient();
 
-  // Integrate react-hook-form with zod validation schema
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
+  const form = useForm({
     resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      category: "",
+      quantity: 0,
+      price: "",
+      caseWeight: 0,
+      itemsPerCase: 0,
+      duration: "",
+      container: "",
+      barcode: barcodeValue,
+    },
   });
 
   const handleClose = () => setOpen(false);
@@ -70,112 +89,146 @@ const NewItemForm = ({ open, setOpen, barcodeValue }) => {
 
   return (
     <Dialog open={open} onClose={handleClose}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogTitle align={"center"}>Add New Item</DialogTitle>
-        <DialogContent>
-          <TextField
-            margin="normal"
-            id="barcode"
-            label="Barcode"
-            type="text"
-            fullWidth
-            defaultValue={barcodeValue}
-            {...register("barcode")}
-            error={!!errors.barcode}
-            helperText={errors.barcode?.message}
-          />
-          <TextField
-            autoFocus
-            margin="normal"
-            id="name"
-            label="Name"
-            type="text"
-            fullWidth
-            {...register("name")}
-            error={!!errors.name}
-            helperText={errors.name?.message}
-          />
-          <TextField
-            margin="normal"
-            id="category"
-            label="Category"
-            type="text"
-            fullWidth
-            {...register("category")}
-            error={!!errors.category}
-            helperText={errors.category?.message}
-          />
-          <TextField
-            margin="normal"
-            id="quantity"
-            label="Quantity"
-            type="number"
-            defaultValue={0}
-            fullWidth
-            {...register("quantity", { valueAsNumber: true })}
-            error={!!errors.quantity}
-            helperText={errors.quantity?.message}
-          />
-          <TextField
-            margin="normal"
-            id="price"
-            label="Price"
-            type="text"
-            fullWidth
-            {...register("price")}
-            error={!!errors.price}
-            helperText={errors.price?.message}
-          />
-          <TextField
-            margin="normal"
-            id="caseWeight"
-            label="Case Weight"
-            type="number"
-            defaultValue={0}
-            fullWidth
-            {...register("caseWeight", { valueAsNumber: true })}
-            error={!!errors.caseWeight}
-            helperText={errors.caseWeight?.message}
-          />
-          <TextField
-            margin="normal"
-            id="itemsPerCase"
-            label="Items Per Case"
-            type="number"
-            defaultValue={0}
-            fullWidth
-            {...register("itemsPerCase", { valueAsNumber: true })}
-            error={!!errors.itemsPerCase}
-            helperText={errors.itemsPerCase?.message}
-          />
-          <TextField
-            margin="normal"
-            id="duration"
-            label="Duration (Sec)"
-            type="text"
-            fullWidth
-            {...register("duration")}
-            error={!!errors.duration}
-            helperText={errors.duration?.message}
-          />
-          <TextField
-            margin="normal"
-            id="container"
-            label="Container"
-            type="text"
-            fullWidth
-            {...register("container")}
-            error={!!errors.container}
-            helperText={errors.container?.message}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit" color="primary">
-            Submit
-          </Button>
-        </DialogActions>
-      </form>
+      <DialogTrigger align={"center"}>Add New Item</DialogTrigger>
+      <DialogContent className="max-h-[90vh] overflow-auto">
+        <DialogHeader>
+          <DialogTitle>Add New Item</DialogTitle>
+          <DialogDescription>Add a new item to the inventory</DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField
+              control={form.control}
+              name="barcode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Barcode</FormLabel>
+                  <Input placeholder="Barcode" {...field} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <Input placeholder="Name" {...field} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <Input placeholder="Category" {...field} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="quantity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Quantity</FormLabel>
+                  <Input
+                    type="number"
+                    placeholder="Quantity"
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Price</FormLabel>
+                  <Input placeholder="Price" {...field} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="caseWeight"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Case Weight</FormLabel>
+                  <Input
+                    type="number"
+                    placeholder="Case Weight"
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="itemsPerCase"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Items Per Case</FormLabel>
+                  <Input
+                    type="number"
+                    placeholder="Items Per Case"
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="duration"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Duration</FormLabel>
+                  <Input placeholder="Duration" {...field} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="container"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Container</FormLabel>
+                  <Input placeholder="Container" {...field} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="mt-6 flex justify-end">
+              <DialogClose asChild>
+                <Button
+                  variant="outline"
+                  onClick={handleClose}
+                  className="ml-2"
+                >
+                  Cancel
+                </Button>
+              </DialogClose>
+              <Button className="ml-2" type="submit" variant="default">
+                Add Item
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
     </Dialog>
   );
 };
