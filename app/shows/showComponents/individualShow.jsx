@@ -3,6 +3,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -14,10 +15,22 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import { ShowInventoryDataTable } from "./selectShowInventoryDataTable";
 import { showInventoryColumns } from "./selectShowInventoryColumns";
 import { ManageShowInventory } from "./manageShowInventory";
 import { Toaster } from "@/components/ui/toaster";
+import { toast } from "@/components/ui/use-toast";
 import PrintableShowDetails from "./PrintableShowDetails";
 
 const supabase = createClient();
@@ -28,6 +41,7 @@ export default function IndividualShow({
   showInventory,
   inventoryData,
 }) {
+  const router = useRouter();
   const [showSummary, setShowSummary] = useState(initialShowSummary);
   const [showInventoryDetails, setShowInventoryDetails] =
     useState(showInventory);
@@ -35,6 +49,7 @@ export default function IndividualShow({
   const [addItemDialogOpen, setAddItemDialogOpen] = useState(false);
   const [manageInventoryDialogOpen, setManageInventoryDialogOpen] =
     useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchShowSummary = useCallback(async () => {
     const { data, error } = await supabase
@@ -169,6 +184,60 @@ export default function IndividualShow({
     printWindow.document.close();
     printWindow.focus();
   }, [show.name]);
+  const handleDeleteShow = async () => {
+    setIsDeleting(true);
+
+    try {
+      // First, get all items currently in the show
+      const { data: showItems, error: fetchError } = await supabase
+        .from("show_inventory")
+        .select("*")
+        .eq("show_id", show.show_id);
+
+      if (fetchError) throw fetchError;
+
+      // For each item, update the inventory
+      for (const item of showItems) {
+        const { error: updateError } = await supabase.rpc(
+          "update_show_inventory",
+          {
+            p_inventory_id: item.inventory_id,
+            p_new_quantity: 0, // Set to 0 to remove from show
+            p_show_id: show.show_id,
+          }
+        );
+
+        if (updateError) throw updateError;
+      }
+
+      // Now delete the show
+      const { error: deleteError } = await supabase
+        .from("shows")
+        .delete()
+        .eq("show_id", show.show_id);
+
+      if (deleteError) throw deleteError;
+
+      toast({
+        title: "Success",
+        description: "Show deleted successfully and inventory updated.",
+      });
+      setShowSummary([]);
+      setShowInventoryDetails([]);
+
+      // Navigate back to the shows list or dashboard
+      router.push("/shows");
+    } catch (error) {
+      console.error("Error during show deletion:", error);
+      toast({
+        title: "Error",
+        description: error.message || "An error occurred during show deletion.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div className="p-6">
@@ -218,7 +287,29 @@ export default function IndividualShow({
             </DialogContent>
           </Dialog>
           <Button onClick={handlePrint}>Print</Button>
-          <Button variant="destructive">Delete Show</Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive">Delete Show</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete the
+                  show and return all assigned items to the inventory.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDeleteShow}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
       <div className="mb-6">
@@ -298,15 +389,17 @@ export default function IndividualShow({
             </DialogContent>
           </Dialog>
         </div>
-        <div style={{ display: "none" }}>
-          <div ref={printableRef}>
-            <PrintableShowDetails
-              show={show}
-              showSummary={showSummary[0]}
-              showInventoryDetails={showInventoryDetails}
-            />
+        {show && showSummary.length > 0 && (
+          <div style={{ display: "none" }}>
+            <div ref={printableRef}>
+              <PrintableShowDetails
+                show={show}
+                showSummary={showSummary[0]}
+                showInventoryDetails={showInventoryDetails}
+              />
+            </div>
           </div>
-        </div>
+        )}
         <Toaster />
       </div>
     </div>
