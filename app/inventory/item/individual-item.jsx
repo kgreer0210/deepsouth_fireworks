@@ -140,7 +140,7 @@ export async function IndividualItem({ item }) {
                 />
               </div>
               <div>
-                <Label htmlFor="container">Container</Label>
+                <Label htmlFor="container">Connex Location</Label>
                 <Input
                   name="container"
                   defaultValue={item.container ? item.container : ""}

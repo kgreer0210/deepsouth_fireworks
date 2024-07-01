@@ -206,7 +206,7 @@ const NewItemForm = ({ open, setOpen, barcodeValue }) => {
               name="container"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Container</FormLabel>
+                  <FormLabel>Connex Location</FormLabel>
                   <Input placeholder="Container" {...field} />
                   <FormMessage />
                 </FormItem>

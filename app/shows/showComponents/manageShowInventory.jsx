@@ -100,37 +100,39 @@ export function ManageShowInventory({ show, onClose }) {
   };
 
   return (
-    <div className="p-4">
+    <div className="flex flex-col h-full max-h-[80vh]">
       <h2 className="text-2xl font-bold mb-4">Manage Show Inventory</h2>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Current Quantity</TableHead>
-            <TableHead>New Quantity</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {showInventory.map((item) => (
-            <TableRow key={item.inventory_id}>
-              <TableCell>{item.firework_name}</TableCell>
-              <TableCell>{item.quantity}</TableCell>
-              <TableCell>
-                <Input
-                  type="number"
-                  min="0"
-                  value={quantityChanges[item.inventory_id] ?? item.quantity}
-                  onChange={(e) =>
-                    handleQuantityChange(item.inventory_id, e.target.value)
-                  }
-                  className="w-20"
-                />
-              </TableCell>
+      <div className="flex-grow overflow-auto">
+        <Table>
+          <TableHeader className="sticky top-0 bg-white z-10">
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Current Quantity</TableHead>
+              <TableHead>New Quantity</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <div className="mt-4 flex justify-end space-x-2">
+          </TableHeader>
+          <TableBody>
+            {showInventory.map((item) => (
+              <TableRow key={item.inventory_id}>
+                <TableCell>{item.firework_name}</TableCell>
+                <TableCell>{item.quantity}</TableCell>
+                <TableCell>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={quantityChanges[item.inventory_id] ?? item.quantity}
+                    onChange={(e) =>
+                      handleQuantityChange(item.inventory_id, e.target.value)
+                    }
+                    className="w-20"
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="mt-4 flex justify-end space-x-2 pt-4 border-t">
         <Button variant="outline" onClick={onClose}>
           Cancel
         </Button>

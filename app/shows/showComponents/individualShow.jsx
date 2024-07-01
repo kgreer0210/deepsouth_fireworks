@@ -274,11 +274,11 @@ export default function IndividualShow({
                 Manage Inventory
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 overflow-hidden">
+            <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 overflow-hidden flex flex-col">
               <DialogHeader className="p-6 pb-0">
                 <DialogTitle>Manage Show Inventory</DialogTitle>
               </DialogHeader>
-              <div className="p-6 pt-0">
+              <div className="flex-grow overflow-auto p-6 pt-0">
                 <ManageShowInventory
                   show={show}
                   onClose={handleManageInventoryDialogClose}
