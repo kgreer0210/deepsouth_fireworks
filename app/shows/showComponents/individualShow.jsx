@@ -51,6 +51,12 @@ export default function IndividualShow({
     useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const isShowInPast = useCallback(() => {
+    const showDate = new Date(show.date_of_show);
+    const currentDate = new Date();
+    return showDate < currentDate;
+  }, [show.date_of_show]);
+
   const fetchShowSummary = useCallback(async () => {
     const { data, error } = await supabase
       .from("show_summary")
@@ -242,8 +248,17 @@ export default function IndividualShow({
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold max-w-72">
+        <h2
+          className={`text-2xl font-bold max-w-72 ${
+            isShowInPast() ? "text-gray-500" : ""
+          }`}
+        >
           Inventory Assigned to {show.name}
+          {isShowInPast() && (
+            <span className="ml-2 text-sm font-normal text-gray-500">
+              (Past Show)
+            </span>
+          )}
         </h2>
         <div className="w-[30%] max-w-72 m-4">
           <p>
@@ -259,57 +274,61 @@ export default function IndividualShow({
           />
         </div>
         <div className="flex space-x-4">
-          <Dialog
-            open={manageInventoryDialogOpen}
-            onOpenChange={(open) => {
-              if (!open) {
-                handleManageInventoryDialogClose();
-              } else {
-                setManageInventoryDialogOpen(true);
-              }
-            }}
-          >
-            <DialogTrigger asChild>
-              <Button onClick={() => setManageInventoryDialogOpen(true)}>
-                Manage Inventory
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 overflow-hidden flex flex-col">
-              <DialogHeader className="p-6 pb-0">
-                <DialogTitle>Manage Show Inventory</DialogTitle>
-              </DialogHeader>
-              <div className="flex-grow overflow-auto p-6 pt-0">
-                <ManageShowInventory
-                  show={show}
-                  onClose={handleManageInventoryDialogClose}
-                />
-              </div>
-            </DialogContent>
-          </Dialog>
+          {!isShowInPast() && (
+            <Dialog
+              open={manageInventoryDialogOpen}
+              onOpenChange={(open) => {
+                if (!open) {
+                  handleManageInventoryDialogClose();
+                } else {
+                  setManageInventoryDialogOpen(true);
+                }
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button onClick={() => setManageInventoryDialogOpen(true)}>
+                  Manage Inventory
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 overflow-hidden flex flex-col">
+                <DialogHeader className="p-6 pb-0">
+                  <DialogTitle>Manage Show Inventory</DialogTitle>
+                </DialogHeader>
+                <div className="flex-grow overflow-auto p-6 pt-0">
+                  <ManageShowInventory
+                    show={show}
+                    onClose={handleManageInventoryDialogClose}
+                  />
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
           <Button onClick={handlePrint}>Print</Button>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive">Delete Show</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete the
-                  show and return all assigned items to the inventory.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDeleteShow}
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? "Deleting..." : "Delete"}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          {!isShowInPast() && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive">Delete Show</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete
+                    the show and return all assigned items to the inventory.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteShow}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? "Deleting..." : "Delete"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
       </div>
       <div className="mb-6">
@@ -361,33 +380,38 @@ export default function IndividualShow({
           )}
         </div>
         <div className="flex justify-center mt-2">
-          <Dialog open={addItemDialogOpen} onOpenChange={setAddItemDialogOpen}>
-            <DialogTrigger asChild>
-              <Button
-                variant="outline"
-                onClick={() => setAddItemDialogOpen(true)}
-              >
-                Add Item to Show
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 overflow-hidden">
-              <DialogHeader className="p-6 pb-0">
-                <DialogTitle>Add Items to Show</DialogTitle>
-                <DialogDescription>
-                  Please select the fireworks you would like to add to this
-                  show.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="p-6 pt-0">
-                <ShowInventoryDataTable
-                  columns={showInventoryColumns}
-                  data={currentInventoryData}
-                  show={show}
-                  onClose={handleAddItemDialogClose}
-                />
-              </div>
-            </DialogContent>
-          </Dialog>
+          {!isShowInPast() && (
+            <Dialog
+              open={addItemDialogOpen}
+              onOpenChange={setAddItemDialogOpen}
+            >
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  onClick={() => setAddItemDialogOpen(true)}
+                >
+                  Add Item to Show
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 overflow-hidden">
+                <DialogHeader className="p-6 pb-0">
+                  <DialogTitle>Add Items to Show</DialogTitle>
+                  <DialogDescription>
+                    Please select the fireworks you would like to add to this
+                    show.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="p-6 pt-0">
+                  <ShowInventoryDataTable
+                    columns={showInventoryColumns}
+                    data={currentInventoryData}
+                    show={show}
+                    onClose={handleAddItemDialogClose}
+                  />
+                </div>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
         {show && showSummary.length > 0 && (
           <div style={{ display: "none" }}>
