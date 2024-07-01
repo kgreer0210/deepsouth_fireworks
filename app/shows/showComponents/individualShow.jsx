@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { ShowInventoryDataTable } from "./selectShowInventoryDataTable";
 import { showInventoryColumns } from "./selectShowInventoryColumns";
-import { ManageShowInventory } from "./ManageShowInventory";
+import { ManageShowInventory } from "./manageShowInventory";
 import { Toaster } from "@/components/ui/toaster";
 
 const supabase = createClient();
