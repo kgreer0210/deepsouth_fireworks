@@ -38,7 +38,7 @@ export default function ShowsPage() {
             </div>
           </TabsContent>
         </Tabs>
-        <AddNewShow open={open} setOpen={setOpen} /> {/* Pass state as props */}
+        <AddNewShow open={open} setOpen={setOpen} />
       </div>
     </div>
   );

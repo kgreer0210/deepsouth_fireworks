@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { createClient } from "@/utils/supabase/client";
+import { toast } from "@/components/ui/use-toast";
 
 const filterFunction = (row, columnId, value) => {
   const name = row.getValue("name")?.toLowerCase() ?? "";
@@ -31,24 +33,127 @@ const filterFunction = (row, columnId, value) => {
   );
 };
 
-export function ShowInventoryDataTable({ columns, data }) {
+const supabase = createClient();
+
+export function ShowInventoryDataTable({ columns, data, show, onClose }) {
   const [globalFilter, setGlobalFilter] = React.useState("");
+  const [rowSelection, setRowSelection] = React.useState({});
+  const [quantityInputs, setQuantityInputs] = React.useState({});
+  const [isProcessing, setIsProcessing] = React.useState(false);
+
+  const handleQuantityChange = (inventoryId, value) => {
+    setQuantityInputs((prev) => ({
+      ...prev,
+      [inventoryId]: Math.max(1, parseInt(value) || 1),
+    }));
+  };
+
+  const handleAssignSelected = async () => {
+    setIsProcessing(true);
+    const selectedRows = table.getSelectedRowModel().rows;
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const row of selectedRows) {
+      const inventoryId = row.original.inventory_id;
+      const quantity = quantityInputs[inventoryId] || 1;
+
+      try {
+        // Check if the item already exists in the show inventory
+        const { data: existingItem, error: checkError } = await supabase
+          .from("show_inventory")
+          .select("quantity")
+          .eq("show_id", show.show_id)
+          .eq("inventory_id", inventoryId)
+          .single();
+
+        if (checkError && checkError.code !== "PGRST116") {
+          throw checkError;
+        }
+
+        let result;
+        if (existingItem) {
+          // Update existing item
+          result = await supabase.rpc("update_show_inventory", {
+            p_inventory_id: inventoryId,
+            p_new_quantity: existingItem.quantity + quantity,
+            p_show_id: show.show_id,
+          });
+        } else {
+          // Insert new item
+          result = await supabase.rpc("insert_show_inventory", {
+            p_inventory_id: inventoryId,
+            p_quantity: quantity,
+            p_show_id: show.show_id,
+          });
+        }
+
+        if (result.error) throw result.error;
+        successCount++;
+        toast({
+          title: "Item Added/Updated",
+          description: `${row.original.name} (Quantity: ${quantity}) ${
+            existingItem ? "updated" : "added"
+          } successfully.`,
+        });
+      } catch (error) {
+        console.error("Error assigning/updating item to show:", error);
+        errorCount++;
+        if (error.message.includes("exceed the show's budget")) {
+          toast({
+            title: "Budget Exceeded",
+            description: `Cannot add/update ${row.original.name}. It would exceed the show's budget.`,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: `Failed to add/update ${row.original.name}. ${error.message}`,
+            variant: "destructive",
+          });
+        }
+      }
+    }
+
+    setIsProcessing(false);
+    setRowSelection({});
+    setQuantityInputs({});
+
+    // Show a summary toast
+    toast({
+      title: "Operation Complete",
+      description: `${successCount} items processed successfully. ${errorCount} failed.`,
+      variant: successCount > 0 ? "default" : "destructive",
+    });
+
+    onClose();
+  };
 
   const table = useReactTable({
     data,
     columns,
     state: {
       globalFilter,
+      rowSelection,
     },
+    enableRowSelection: true,
+    onRowSelectionChange: setRowSelection,
     globalFilterFn: filterFunction,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: 10, // Set your desired page size
+      },
+    },
   });
 
   return (
-    <div>
+    <div className="flex flex-col h-[calc(100vh-200px)]">
+      {" "}
+      {/* Adjust the height as needed */}
       <div className="flex items-center py-4">
         <Input
           placeholder="Search by name, category, or duration..."
@@ -57,24 +162,21 @@ export function ShowInventoryDataTable({ columns, data }) {
           className="max-w-sm mr-2"
         />
       </div>
-
-      <div className="rounded-md border overflow-x-auto">
+      <div className="rounded-md border flex-grow overflow-auto">
         <Table>
-          <TableHeader>
+          <TableHeader className="sticky top-0 bg-background z-10">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
@@ -86,13 +188,25 @@ export function ShowInventoryDataTable({ columns, data }) {
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className="whitespace-nowrap overflow-hidden overflow-ellipsis max-w-xs"
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
+                    <TableCell key={cell.id}>
+                      {cell.column.id === "quantityToAdd" ? (
+                        <Input
+                          type="number"
+                          min="1"
+                          value={quantityInputs[row.original.inventory_id] || 1}
+                          onChange={(e) =>
+                            handleQuantityChange(
+                              row.original.inventory_id,
+                              e.target.value
+                            )
+                          }
+                          className="w-20"
+                        />
+                      ) : (
+                        flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )
                       )}
                     </TableCell>
                   ))}
@@ -116,21 +230,29 @@ export function ShowInventoryDataTable({ columns, data }) {
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
         <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
+          onClick={handleAssignSelected}
+          disabled={Object.keys(rowSelection).length === 0 || isProcessing}
         >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
+          {isProcessing ? "Processing..." : "Assign Selected to Show"}
         </Button>
       </div>
     </div>

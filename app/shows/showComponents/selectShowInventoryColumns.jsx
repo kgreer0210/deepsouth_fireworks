@@ -42,6 +42,11 @@ export const showInventoryColumns = [
     },
   },
   {
+    id: "quantityToAdd",
+    header: "Quantity to Add",
+    cell: ({ row }) => <div className="text-center">-</div>,
+  },
+  {
     accessorKey: "quantity",
     header: ({ column }) => {
       return (
@@ -49,7 +54,7 @@ export const showInventoryColumns = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Quantity
+          Available Quantity
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -72,12 +77,10 @@ export const showInventoryColumns = [
     accessorKey: "category",
     header: "Category",
   },
-  //size
   {
     accessorKey: "size",
     header: "Size",
   },
-  //container
   {
     accessorKey: "container",
     header: "Container",

@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -10,17 +10,18 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ShowInventoryDataTable } from "./selectShowInventoryDataTable";
 import { showInventoryColumns } from "./selectShowInventoryColumns";
+import { ManageShowInventory } from "./ManageShowInventory";
+import { Toaster } from "@/components/ui/toaster";
 
 const supabase = createClient();
 
-export default function IndiviualShow({
+export default function IndividualShow({
   show,
   initialShowSummary,
   showInventory,
@@ -30,48 +31,55 @@ export default function IndiviualShow({
   const [showInventoryDetails, setShowInventoryDetails] =
     useState(showInventory);
   const [currentInventoryData, setInventoryData] = useState(inventoryData);
+  const [addItemDialogOpen, setAddItemDialogOpen] = useState(false);
+  const [manageInventoryDialogOpen, setManageInventoryDialogOpen] =
+    useState(false);
+
+  const fetchShowSummary = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("show_summary")
+      .select("*")
+      .eq("show_id", show.show_id);
+    if (error) {
+      console.error("Error fetching show summary:", error);
+    } else {
+      setShowSummary(data);
+    }
+  }, [show.show_id]);
+
+  const fetchShowInventory = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("show_firework_details")
+      .select("*")
+      .eq("show_id", show.show_id);
+    if (error) {
+      console.error("Error fetching show inventory:", error);
+    } else {
+      setShowInventoryDetails(data);
+    }
+  }, [show.show_id]);
+
+  const fetchInventory = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("inventory")
+      .select("*")
+      .gte("quantity", 1);
+    if (error) {
+      console.error("Error fetching inventory:", error);
+    } else {
+      setInventoryData(data);
+    }
+  }, []);
+
+  const refreshAllData = useCallback(() => {
+    fetchShowSummary();
+    fetchShowInventory();
+    fetchInventory();
+  }, [fetchShowSummary, fetchShowInventory, fetchInventory]);
 
   useEffect(() => {
-    const showId = show.show_id;
-
-    const fetchInventory = async () => {
-      const { data, error } = await supabase
-        .from("inventory")
-        .select("*")
-        .gte("quantity", 1);
-      if (error) {
-        console.error("Error fetching inventory:", error);
-      } else {
-        setInventoryData(data);
-      }
-    };
-
-    const fetchShowSummary = async () => {
-      const { data, error } = await supabase
-        .from("show_summary")
-        .select("*")
-        .eq("show_id", showId);
-      if (error) {
-        console.error("Error fetching show summary:", error);
-      } else {
-        setShowSummary(data);
-      }
-    };
-
-    const fetchShowInventory = async () => {
-      const { data, error } = await supabase
-        .from("show_firework_details")
-        .select("*")
-        .eq("show_id", showId);
-      if (error) {
-        console.error("Error fetching show inventory:", error);
-      } else {
-        setShowInventoryDetails(data);
-      }
-    };
-
     const handlePayload = () => {
-      fetchShowSummary();
+      refreshAllData();
     };
 
     const inventoryChannel = supabase
@@ -101,16 +109,24 @@ export default function IndiviualShow({
       )
       .subscribe();
 
-    fetchShowSummary();
-    fetchShowInventory();
-    fetchInventory();
+    refreshAllData();
 
     return () => {
       supabase.removeChannel(inventoryChannel);
       supabase.removeChannel(showsChannel);
       supabase.removeChannel(showInventoryChannel);
     };
-  }, [show.show_id]);
+  }, [refreshAllData]);
+
+  const handleAddItemDialogClose = () => {
+    setAddItemDialogOpen(false);
+    refreshAllData();
+  };
+
+  const handleManageInventoryDialogClose = useCallback(() => {
+    setManageInventoryDialogOpen(false);
+    refreshAllData();
+  }, [refreshAllData]);
 
   return (
     <div className="p-6">
@@ -132,6 +148,33 @@ export default function IndiviualShow({
           />
         </div>
         <div className="flex space-x-4">
+          <Dialog
+            open={manageInventoryDialogOpen}
+            onOpenChange={(open) => {
+              if (!open) {
+                handleManageInventoryDialogClose();
+              } else {
+                setManageInventoryDialogOpen(true);
+              }
+            }}
+          >
+            <DialogTrigger asChild>
+              <Button onClick={() => setManageInventoryDialogOpen(true)}>
+                Manage Inventory
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 overflow-hidden">
+              <DialogHeader className="p-6 pb-0">
+                <DialogTitle>Manage Show Inventory</DialogTitle>
+              </DialogHeader>
+              <div className="p-6 pt-0">
+                <ManageShowInventory
+                  show={show}
+                  onClose={handleManageInventoryDialogClose}
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
           <Button>Print</Button>
           <Button variant="destructive">Delete Show</Button>
         </div>
@@ -185,25 +228,35 @@ export default function IndiviualShow({
           )}
         </div>
         <div className="flex justify-center mt-2">
-          <Dialog>
+          <Dialog open={addItemDialogOpen} onOpenChange={setAddItemDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline">Add Item to Show</Button>
+              <Button
+                variant="outline"
+                onClick={() => setAddItemDialogOpen(true)}
+              >
+                Add Item to Show
+              </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-[90vw]">
-              <DialogHeader>
+            <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 overflow-hidden">
+              <DialogHeader className="p-6 pb-0">
                 <DialogTitle>Add Items to Show</DialogTitle>
                 <DialogDescription>
                   Please select the fireworks you would like to add to this
                   show.
                 </DialogDescription>
               </DialogHeader>
-              <ShowInventoryDataTable
-                columns={showInventoryColumns}
-                data={currentInventoryData}
-              />
+              <div className="p-6 pt-0">
+                <ShowInventoryDataTable
+                  columns={showInventoryColumns}
+                  data={currentInventoryData}
+                  show={show}
+                  onClose={handleAddItemDialogClose}
+                />
+              </div>
             </DialogContent>
           </Dialog>
         </div>
+        <Toaster />
       </div>
     </div>
   );
