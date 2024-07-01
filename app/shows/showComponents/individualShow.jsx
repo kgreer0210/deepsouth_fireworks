@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -18,6 +18,7 @@ import { ShowInventoryDataTable } from "./selectShowInventoryDataTable";
 import { showInventoryColumns } from "./selectShowInventoryColumns";
 import { ManageShowInventory } from "./manageShowInventory";
 import { Toaster } from "@/components/ui/toaster";
+import PrintableShowDetails from "./PrintableShowDetails";
 
 const supabase = createClient();
 
@@ -128,6 +129,47 @@ export default function IndividualShow({
     refreshAllData();
   }, [refreshAllData]);
 
+  const printableRef = useRef();
+
+  const handlePrint = useCallback(() => {
+    const printContent = printableRef.current;
+    const printWindow = window.open("", "_blank");
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${show.name} - Show Details</title>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { width: 90%; margin: 0 auto; padding: 20px; }
+            h1 { color: #2c3e50; }
+            table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            .print-button { display: none; }
+            @media print {
+              .print-button { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            ${printContent.innerHTML}
+            <br>
+            <button class="print-button" onclick="window.print()">Print</button>
+          </div>
+          <script>
+            document.querySelector('.print-button').style.display = 'block';
+          </script>
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    printWindow.focus();
+  }, [show.name]);
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -175,31 +217,31 @@ export default function IndividualShow({
               </div>
             </DialogContent>
           </Dialog>
-          <Button>Print</Button>
+          <Button onClick={handlePrint}>Print</Button>
           <Button variant="destructive">Delete Show</Button>
         </div>
       </div>
       <div className="mb-6">
         <div className="flex justify-center mt-2">
           {showInventoryDetails.length > 0 ? (
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-gray-200 border">
               <thead className="bg-gray-50">
                 <tr>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border"
                   >
                     Firework
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border"
                   >
                     Quantity
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border"
                   >
                     Total Price
                   </th>
@@ -208,13 +250,13 @@ export default function IndividualShow({
               <tbody className="bg-white divide-y divide-gray-200">
                 {showInventoryDetails.map((item) => (
                   <tr key={item.id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border">
                       {item.firework_name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border">
                       {item.quantity}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border">
                       ${item.total_price}
                     </td>
                   </tr>
@@ -255,6 +297,15 @@ export default function IndividualShow({
               </div>
             </DialogContent>
           </Dialog>
+        </div>
+        <div style={{ display: "none" }}>
+          <div ref={printableRef}>
+            <PrintableShowDetails
+              show={show}
+              showSummary={showSummary[0]}
+              showInventoryDetails={showInventoryDetails}
+            />
+          </div>
         </div>
         <Toaster />
       </div>
