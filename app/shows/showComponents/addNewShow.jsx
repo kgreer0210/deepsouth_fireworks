@@ -33,6 +33,7 @@ const formSchema = z.object({
 
 const AddNewShow = ({ open, setOpen }) => {
   const supabase = createClient();
+  const [budgetPercentage, setBudgetPercentage] = React.useState(30);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -54,6 +55,7 @@ const AddNewShow = ({ open, setOpen }) => {
       duration: "",
       dateOfShow: new Date().toISOString().split("T")[0],
     });
+    setBudgetPercentage(30);
   };
 
   const onSubmit = async (data) => {
@@ -72,6 +74,18 @@ const AddNewShow = ({ open, setOpen }) => {
     } else {
       alert("Show successfully added");
       handleClose();
+    }
+  };
+
+  //function to calculate both budget and percentage
+  const updateBudget = (revenue) => {
+    const budget = revenue ? Math.round(revenue * 0.3) : "";
+    form.setValue("budget", budget);
+    if (revenue && budget) {
+      const percentage = (budget / revenue) * 100;
+      setBudgetPercentage(Math.round(percentage * 10) / 10); // Round to nearest tenth
+    } else {
+      setBudgetPercentage(30);
     }
   };
 
@@ -105,11 +119,13 @@ const AddNewShow = ({ open, setOpen }) => {
                     placeholder="Revenue"
                     {...field}
                     value={field.value || ""}
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value ? Number(e.target.value) : ""
-                      )
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value
+                        ? Number(e.target.value)
+                        : "";
+                      field.onChange(value);
+                      updateBudget(value);
+                    }}
                   />
                   <FormMessage />
                 </FormItem>
@@ -120,17 +136,23 @@ const AddNewShow = ({ open, setOpen }) => {
               name="budget"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Budget</FormLabel>
+                  <FormLabel>{`Budget (${budgetPercentage}% of Revenue)`}</FormLabel>
                   <Input
                     type="number"
                     placeholder="Budget"
                     {...field}
                     value={field.value || ""}
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value ? Number(e.target.value) : ""
-                      )
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value
+                        ? Number(e.target.value)
+                        : "";
+                      field.onChange(value);
+                      const revenue = form.getValues("revenue");
+                      if (revenue && value) {
+                        const percentage = (value / revenue) * 100;
+                        setBudgetPercentage(Math.round(percentage * 10) / 10);
+                      }
+                    }}
                   />
                   <FormMessage />
                 </FormItem>
@@ -167,8 +189,8 @@ const AddNewShow = ({ open, setOpen }) => {
                     type="date"
                     placeholder="Date of Show"
                     {...field}
-                    value={field.value} // Ensure the value is correctly set
-                    onChange={(e) => field.onChange(e.target.value)} // Use the correct value from the input
+                    value={field.value}
+                    onChange={(e) => field.onChange(e.target.value)}
                   />
                   <FormMessage />
                 </FormItem>
