@@ -1,8 +1,9 @@
 "use client";
-
-import { ArrowUpDown } from "lucide-react";
+import { useState } from "react";
+import { ArrowUpDown, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import VideoPlayer from "./VideoPlayer";
 
 export const showInventoryColumns = [
   {
@@ -96,6 +97,34 @@ export const showInventoryColumns = [
           Duration
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "video_url",
+    header: "Video",
+    cell: ({ row }) => {
+      const url = row.getValue("video_url");
+      const [isPlaying, setIsPlaying] = useState(false);
+
+      if (!url) return null;
+
+      return (
+        <div>
+          <Button
+            variant="ghost"
+            className="p-0 hover:bg-transparent"
+            onClick={() => setIsPlaying(!isPlaying)}
+          >
+            <Film className="h-4 w-4 mr-2" />
+            {isPlaying ? "Hide Video" : "Watch Video"}
+          </Button>
+          {isPlaying && (
+            <div className="mt-2">
+              <VideoPlayer url={url} />
+            </div>
+          )}
+        </div>
       );
     },
   },

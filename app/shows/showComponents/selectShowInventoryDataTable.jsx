@@ -199,24 +199,9 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {cell.column.id === "quantityToAdd" ? (
-                        <Input
-                          type="number"
-                          min="1"
-                          value={quantityInputs[row.original.inventory_id] || 1}
-                          onChange={(e) =>
-                            handleQuantityChange(
-                              row.original.inventory_id,
-                              e.target.value
-                            )
-                          }
-                          className="w-20"
-                        />
-                      ) : (
-                        flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
                       )}
                     </TableCell>
                   ))}
