@@ -153,6 +153,10 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    meta: {
+      quantityInputs,
+      handleQuantityChange,
+    },
     initialState: {
       pagination: {
         pageSize: 10, // Set your desired page size

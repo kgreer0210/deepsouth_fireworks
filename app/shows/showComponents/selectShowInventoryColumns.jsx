@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ArrowUpDown, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import VideoModal from "@/app/inventory/inventoryComponents/VideoModal";
 
 export const showInventoryColumns = [
@@ -45,7 +46,20 @@ export const showInventoryColumns = [
   {
     id: "quantityToAdd",
     header: "Quantity to Add",
-    cell: ({ row }) => <div className="text-center">-</div>,
+    cell: ({ row, table }) => {
+      const inventoryId = row.original.inventory_id;
+      // Access quantityInputs and handleQuantityChange from table.options.meta
+      const { quantityInputs, handleQuantityChange } = table.options.meta;
+      return (
+        <Input
+          type="number"
+          min="1"
+          value={quantityInputs[inventoryId] || 1}
+          onChange={(e) => handleQuantityChange(inventoryId, e.target.value)}
+          className="w-20"
+        />
+      );
+    },
   },
   {
     accessorKey: "quantity",
