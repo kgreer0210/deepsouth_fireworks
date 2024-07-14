@@ -58,6 +58,12 @@ export function DataTable({ columns, data, isMainPage = false }) {
     onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
     globalFilterFn: filterFunction,
+    meta: {
+      updateData: (rowIndex, columnId, value) => {
+        // This function isn't implemented in the code you provided,
+        // but you might want to add it if you need to update data
+      },
+    },
   });
 
   return (

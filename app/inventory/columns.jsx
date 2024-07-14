@@ -1,6 +1,6 @@
 "use client";
-
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { useState } from "react";
+import { ArrowUpDown, MoreHorizontal, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -13,6 +13,7 @@ import {
 
 import Link from "next/link";
 import { deleteInventory } from "../data/inventoryData";
+import VideoModal from "@/components/VideoModal";
 
 export const columns = [
   {
@@ -73,7 +74,32 @@ export const columns = [
   //video_url
   {
     accessorKey: "video_url",
-    header: "Video URL",
+    header: "Video",
+    cell: ({ row }) => {
+      const url = row.getValue("video_url");
+      const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+
+      if (!url) return null;
+
+      return (
+        <>
+          <Button
+            variant="ghost"
+            className="p-0 hover:bg-transparent"
+            onClick={() => setIsVideoModalOpen(true)}
+          >
+            <Film className="h-4 w-4 mr-2" />
+            Watch Video
+          </Button>
+          <VideoModal
+            isOpen={isVideoModalOpen}
+            onClose={() => setIsVideoModalOpen(false)}
+            videoUrl={url}
+            title={row.getValue("name")}
+          />
+        </>
+      );
+    },
   },
   //barcode
   {
@@ -119,26 +145,27 @@ export const columns = [
     header: "Actions",
     cell: ({ row }) => {
       const rowId = row.original;
+      const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
       const deleteItem = async () => {
         await deleteInventory(rowId.inventory_id);
       };
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>
-              <Link href={`/inventory/item/${rowId.inventory_id}`}>
-                Edit Item
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            {/* <AlertDialog>
+        <>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem>
+                <Link href={`/inventory/item/${rowId.inventory_id}`}>
+                  Edit Item
+                </Link>
+              </DropdownMenuItem>
+              {/* <AlertDialog>
               <AlertDialogTrigger className="text-red-500 text-sm m-1">
                 Delete Item
               </AlertDialogTrigger>
@@ -158,8 +185,17 @@ export const columns = [
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog> */}
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {rowId.video_url && rowId.video_url.trim() !== "" && (
+            <VideoModal
+              isOpen={isVideoModalOpen}
+              onClose={() => setIsVideoModalOpen(false)}
+              videoUrl={rowId.video_url}
+              title={rowId.name}
+            />
+          )}
+        </>
       );
     },
   },
