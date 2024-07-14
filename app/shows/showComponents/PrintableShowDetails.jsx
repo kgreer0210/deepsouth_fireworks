@@ -27,6 +27,7 @@ const PrintableShowDetails = ({ show, showSummary, showInventoryDetails }) => {
         <thead>
           <tr className="bg-gray-100">
             <th className="border border-gray-300 p-2">Firework Name</th>
+            <th className="border border-gray-300 p-2">Connex Location</th>
             <th className="border border-gray-300 p-2">Quantity</th>
             <th className="border border-gray-300 p-2">Price</th>
             <th className="border border-gray-300 p-2">Weight of Products</th>
@@ -38,6 +39,7 @@ const PrintableShowDetails = ({ show, showSummary, showInventoryDetails }) => {
               <td className="border border-gray-300 p-2">
                 {item.firework_name}
               </td>
+              <td className="border border-gray-300 p-2">{item.container}</td>
               <td className="border border-gray-300 p-2">{item.quantity}</td>
               <td className="border border-gray-300 p-2">
                 ${formatNumber(item.total_price)}
