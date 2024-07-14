@@ -1,6 +1,7 @@
 import { Roboto as FontSans } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 
 const fontSans = FontSans({
@@ -25,6 +26,7 @@ export default async function RootLayout({ children }) {
         <div className="flex h-screen">
           <Sidebar />
           {children}
+          <Toaster />
         </div>
       </body>
     </html>

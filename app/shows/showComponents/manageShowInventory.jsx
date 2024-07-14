@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
 
 const supabase = createClient();
@@ -76,17 +76,13 @@ export function ManageShowInventory({ show, onClose }) {
             if (error) throw error;
           }
 
-          toast({
-            title: "Success",
-            description: `Updated inventory item ${inventoryId}`,
-          });
+          toast.success(`Updated inventory item ${inventoryId}`);
         } catch (error) {
           console.error(`Error updating item ${inventoryId}:`, error);
-          toast({
-            title: "Error",
-            description: `Failed to update inventory item ${inventoryId}. ${error.message}`,
-            variant: "destructive",
-          });
+          toast.error(
+            `Failed to update inventory item ${inventoryId}. ${error.message}`
+          );
+
           hasErrors = true;
         }
       }

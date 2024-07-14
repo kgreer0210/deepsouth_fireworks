@@ -29,8 +29,7 @@ import {
 import { ShowInventoryDataTable } from "./selectShowInventoryDataTable";
 import { showInventoryColumns } from "./selectShowInventoryColumns";
 import { ManageShowInventory } from "./manageShowInventory";
-import { Toaster } from "@/components/ui/toaster";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import PrintableShowDetails from "./PrintableShowDetails";
 
 const supabase = createClient();
@@ -224,10 +223,8 @@ export default function IndividualShow({
 
       if (deleteError) throw deleteError;
 
-      toast({
-        title: "Success",
-        description: "Show deleted successfully and inventory updated.",
-      });
+      toast.success("Show deleted successfully and inventory updated.");
+
       setShowSummary([]);
       setShowInventoryDetails([]);
 
@@ -235,11 +232,7 @@ export default function IndividualShow({
       router.push("/shows");
     } catch (error) {
       console.error("Error during show deletion:", error);
-      toast({
-        title: "Error",
-        description: error.message || "An error occurred during show deletion.",
-        variant: "destructive",
-      });
+      toast.error(error.message || "An error occurred during show deletion.");
     } finally {
       setIsDeleting(false);
     }
@@ -424,7 +417,6 @@ export default function IndividualShow({
             </div>
           </div>
         )}
-        <Toaster />
       </div>
     </div>
   );

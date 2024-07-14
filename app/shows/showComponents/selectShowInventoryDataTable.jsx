@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/utils/supabase/client";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 const filterFunction = (row, columnId, value) => {
   const name = row.getValue("name")?.toLowerCase() ?? "";
@@ -53,6 +53,7 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
     const selectedRows = table.getSelectedRowModel().rows;
     let successCount = 0;
     let errorCount = 0;
+    let budgetExceededItems = [];
 
     for (const row of selectedRows) {
       const inventoryId = row.original.inventory_id;
@@ -88,31 +89,38 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
           });
         }
 
-        if (result.error) throw result.error;
+        if (result.error) {
+          throw result.error;
+        }
+
         successCount++;
-        toast({
-          title: "Item Added/Updated",
-          description: `${row.original.name} (Quantity: ${quantity}) ${
+        toast.success(
+          `${row.original.name} (Quantity: ${quantity}) ${
             existingItem ? "updated" : "added"
-          } successfully.`,
-        });
+          } successfully.`
+        );
       } catch (error) {
         console.error("Error assigning/updating item to show:", error);
         errorCount++;
-        if (error.message.includes("exceed the show's budget")) {
-          toast({
-            title: "Budget Exceeded",
-            description: `Cannot add/update ${row.original.name}. It would exceed the show's budget.`,
-            variant: "destructive",
-          });
+        if (
+          error.message &&
+          error.message.includes("exceed the show's budget")
+        ) {
+          budgetExceededItems.push(row.original.name);
         } else {
-          toast({
-            title: "Error",
-            description: `Failed to add/update ${row.original.name}. ${error.message}`,
-            variant: "destructive",
-          });
+          toast.error(
+            `Failed to add/update ${row.original.name}. ${error.message}`
+          );
         }
       }
+    }
+
+    if (budgetExceededItems.length > 0) {
+      toast.error(
+        `Budget Exceeded: Cannot add/update the following items as they would exceed the show's budget: ${budgetExceededItems.join(
+          ", "
+        )}`
+      );
     }
 
     setIsProcessing(false);
@@ -120,11 +128,13 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
     setQuantityInputs({});
 
     // Show a summary toast
-    toast({
-      title: "Operation Complete",
-      description: `${successCount} items processed successfully. ${errorCount} failed.`,
-      variant: successCount > 0 ? "default" : "destructive",
-    });
+    toast(
+      `Operation Complete: ${successCount} items processed successfully. ${errorCount} failed.${
+        budgetExceededItems.length > 0
+          ? ` ${budgetExceededItems.length} items exceeded budget.`
+          : ""
+      }`
+    );
 
     onClose();
   };

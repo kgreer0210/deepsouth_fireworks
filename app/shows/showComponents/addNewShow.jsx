@@ -21,6 +21,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/utils/supabase/client";
+import { toast } from "sonner";
 
 // Define the validation schema using zod
 const formSchema = z.object({
@@ -72,7 +73,8 @@ const AddNewShow = ({ open, setOpen }) => {
     if (error) {
       console.error("Error adding show:", error);
     } else {
-      alert("Show successfully added");
+      toast.success("Show added successfully");
+
       handleClose();
     }
   };
