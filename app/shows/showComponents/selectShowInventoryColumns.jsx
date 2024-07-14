@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ArrowUpDown, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import VideoPlayer from "./VideoPlayer";
+import VideoModal from "@/app/inventory/inventoryComponents/VideoModal";
 
 export const showInventoryColumns = [
   {
@@ -105,26 +105,27 @@ export const showInventoryColumns = [
     header: "Video",
     cell: ({ row }) => {
       const url = row.getValue("video_url");
-      const [isPlaying, setIsPlaying] = useState(false);
+      const [isModalOpen, setIsModalOpen] = useState(false);
 
       if (!url) return null;
 
       return (
-        <div>
+        <>
           <Button
             variant="ghost"
             className="p-0 hover:bg-transparent"
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={() => setIsModalOpen(true)}
           >
             <Film className="h-4 w-4 mr-2" />
-            {isPlaying ? "Hide Video" : "Watch Video"}
+            Watch Video
           </Button>
-          {isPlaying && (
-            <div className="mt-2">
-              <VideoPlayer url={url} />
-            </div>
-          )}
-        </div>
+          <VideoModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            videoUrl={url}
+            title={row.getValue("name")}
+          />
+        </>
       );
     },
   },

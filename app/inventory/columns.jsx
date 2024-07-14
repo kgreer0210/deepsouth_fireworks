@@ -13,7 +13,7 @@ import {
 
 import Link from "next/link";
 import { deleteInventory } from "../data/inventoryData";
-import VideoModal from "@/components/VideoModal";
+import VideoModal from "@/app/inventory/inventoryComponents/VideoModal";
 
 export const columns = [
   {
