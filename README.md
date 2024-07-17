@@ -1,36 +1,39 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+Fireworks Inventory and Show Management Application
 
-## Getting Started
+Description
+This application is designed to manage fireworks inventory and organize fireworks shows. It allows users to track inventory, create and manage shows, assign fireworks to shows, and view detailed information about each show and inventory item.
 
-First, run the development server:
+Key Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Inventory Management: Track fireworks items, including quantity, price, and details.
+Show Management: Create, edit, and delete fireworks shows.
+Inventory Assignment: Assign fireworks to specific shows with quantity tracking.
+Budget Tracking: Monitor show budgets and prevent overspending.
+Video Integration: View product videos for fireworks items.
+Printable Show Details: Generate printable summaries of show inventories.
+Real-time Updates: Live data synchronization using Supabase.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Technologies Used
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Next.js
+React
+Supabase (for backend and real-time data)
+Tailwind CSS
+Shadcn UI components
+Tanstack Table (for data tables)
+Sonner (for toast notifications)
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Usage
+(Provide basic instructions on how to run the application locally)
+Database
+The application uses Supabase as its database. Key tables include:
 
-## Learn More
+inventory: Stores fireworks items
+shows: Manages fireworks shows
+show_inventory: Links inventory items to specific shows
 
-To learn more about Next.js, take a look at the following resources:
+API
+The application uses Supabase RPC functions for database operations, including:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+insert_show_inventory
+update_show_inventory
