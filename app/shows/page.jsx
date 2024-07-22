@@ -28,14 +28,27 @@ export default function ShowsPage() {
             <Button onClick={() => setOpen(true)}>Add New Show</Button>
           </div>
           <TabsContent value="upcoming">
-            <div className="text-left">
-              <Shows shows={shows} currentDate={currentDate} type="upcoming" />
-            </div>
+            {shows.length > 0 ? (
+              <div className="text-left">
+                <Shows
+                  shows={shows}
+                  currentDate={currentDate}
+                  type="upcoming"
+                />
+              </div>
+            ) : (
+              <h2 className="text-2xl font-semibold mb-4">No Upcoming Shows</h2>
+            )}
           </TabsContent>
           <TabsContent value="past">
-            <div className="text-left">
-              <Shows shows={shows} currentDate={currentDate} type="past" />
-            </div>
+            {shows.filter((show) => new Date(show.date_of_show) < currentDate)
+              .length > 0 ? (
+              <div className="text-left">
+                <Shows shows={shows} currentDate={currentDate} type="past" />
+              </div>
+            ) : (
+              <h2 className="text-2xl font-semibold mb-4">No Past Shows</h2>
+            )}
           </TabsContent>
         </Tabs>
         <AddNewShow open={open} setOpen={setOpen} />
