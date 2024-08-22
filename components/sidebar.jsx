@@ -19,7 +19,6 @@ export default async function Sidebar() {
           <Link href="/shows">
             <li className="mb-2 p-2 hover:bg-gray-700 rounded">Shows</li>
           </Link>
-          <li className="mb-2 p-2 hover:bg-gray-700 rounded">Team</li>
         </ul>
       </div>
     </div>
