@@ -146,9 +146,6 @@ export const columns = [
     cell: ({ row }) => {
       const rowId = row.original;
       const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
-      const deleteItem = async () => {
-        await deleteInventory(rowId.inventory_id);
-      };
       return (
         <>
           <DropdownMenu>
@@ -165,26 +162,6 @@ export const columns = [
                   Edit Item
                 </Link>
               </DropdownMenuItem>
-              {/* <AlertDialog>
-              <AlertDialogTrigger className="text-red-500 text-sm m-1">
-                Delete Item
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    this item from the server.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={deleteItem}>
-                    Continue
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog> */}
             </DropdownMenuContent>
           </DropdownMenu>
           {rowId.video_url && rowId.video_url.trim() !== "" && (
