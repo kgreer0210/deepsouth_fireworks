@@ -160,7 +160,6 @@ export const columns = [
       const handleDelete = async () => {
         try {
           await deleteInventory(rowId.inventory_id);
-          // You might want to refresh the data or update the UI here
           setIsDeleteDialogOpen(false);
         } catch (error) {
           console.error("Error deleting item:", error);
