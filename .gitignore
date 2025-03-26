@@ -37,3 +37,10 @@ next-env.d.ts
 
 # Sentry Config File
 .sentryclirc
+
+# cursor
+.cursor/
+**/.cursor/
+**/.cursor/**
+**/mcp.json
+.cursor/mcp.json
