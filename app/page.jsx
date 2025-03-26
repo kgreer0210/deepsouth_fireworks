@@ -2,7 +2,6 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import InventoryTable from "@/app/inventory/inventoryTable";
 import Overview from "@/app/inventory/overview/overview";
-import { logout } from "@/app/logout/actions";
 import {
   getTotalInventoryQuantity,
   getTotalInventoryValue,
@@ -14,7 +13,7 @@ export default async function Home() {
   const supabase = createClient();
   const { data: user, error: userError } = await supabase.auth.getUser();
   if (userError || !user) {
-    redirect("/login");
+    redirect("/sign-in");
   }
 
   // Fetch other data as before
@@ -37,9 +36,6 @@ export default async function Home() {
       <div className="flex-1 p-4">
         <InventoryTable />
       </div>
-      <form action={logout}>
-        <button type="submit">Sign Out</button>
-      </form>
     </div>
   );
 }
