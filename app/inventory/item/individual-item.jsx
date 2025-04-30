@@ -5,13 +5,11 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
-import { Toaster } from "@/components/ui/toaster";
+import { toast } from "sonner";
 import { useState } from "react";
 import { editItemServer } from "./editItemAction";
 
 export function IndividualItem({ item }) {
-  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (event) => {
@@ -21,24 +19,13 @@ export function IndividualItem({ item }) {
     try {
       const result = await editItemServer(formData, item.inventory_id);
       if (result.success) {
-        toast({
-          title: "Success",
-          description: result.message,
-        });
+        toast.success(result.message);
       } else {
-        toast({
-          title: "Error",
-          description: result.message,
-          variant: "destructive",
-        });
+        toast.error(result.message);
       }
     } catch (error) {
       console.error("Error updating item:", error);
-      toast({
-        title: "Error",
-        description: "An unexpected error occurred",
-        variant: "destructive",
-      });
+      toast.error("An unexpected error occurred");
     } finally {
       setIsSubmitting(false);
     }
@@ -161,7 +148,6 @@ export function IndividualItem({ item }) {
           </Card>
         </div>
       </form>
-      <Toaster />
     </>
   );
 }

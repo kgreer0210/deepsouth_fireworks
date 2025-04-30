@@ -25,6 +25,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/utils/supabase/client";
+import { toast } from "sonner";
 
 // Define the validation schema using zod
 const formSchema = z.object({
@@ -80,9 +81,9 @@ const NewItemForm = ({ open, setOpen, barcodeValue }) => {
     ]);
 
     if (error) {
-      console.error("Error adding item to inventory:", error);
+      toast.error("Error adding item to inventory");
     } else {
-      alert("Item added to inventory");
+      toast.success(`${data.name} has been added to your inventory`);
     }
     handleClose();
   };
