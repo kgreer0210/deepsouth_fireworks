@@ -13,6 +13,17 @@ import { cn } from '@/lib/utils';
 
 const PAGE_SIZE = 50;
 
+const ACTION_TYPES = [
+  'inventory.created',
+  'inventory.updated',
+  'inventory.deleted',
+  'show.created',
+  'show.deleted',
+  'show_inventory.assigned',
+  'show_inventory.updated',
+  'show_inventory.removed',
+];
+
 export default async function AuditLogPage({ searchParams }) {
   const supabase = createClient();
 
@@ -24,23 +35,13 @@ export default async function AuditLogPage({ searchParams }) {
     redirect('/login');
   }
 
-  const role = await getUserRole(supabase);
+  const role = await getUserRole(supabase, user);
   if (role !== 'admin') {
     redirect('/');
   }
 
   const page = Math.max(1, parseInt(searchParams?.page ?? '1', 10) || 1);
   const filter = searchParams?.filter ?? '';
-
-  // Fetch distinct action types for the filter dropdown
-  const { data: actionTypes } = await supabase
-    .from('actions_log')
-    .select('action_type')
-    .order('action_type');
-
-  const distinctActionTypes = [
-    ...new Set((actionTypes ?? []).map((r) => r.action_type).filter(Boolean)),
-  ];
 
   // Build main query
   let query = supabase
@@ -60,6 +61,19 @@ export default async function AuditLogPage({ searchParams }) {
   }
 
   const totalPages = count ? Math.ceil(count / PAGE_SIZE) : 1;
+
+  if (error) {
+    return (
+      <div className="flex flex-1 flex-col overflow-y-auto">
+        <h1 className="text-2xl text-center font-bold mt-4">Audit Log</h1>
+        <div className="p-4">
+          <div className="rounded-md border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
+            Failed to load audit log: {error.message}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   function buildUrl(newPage, newFilter) {
     const params = new URLSearchParams();
@@ -116,7 +130,7 @@ export default async function AuditLogPage({ searchParams }) {
             )}
           >
             <option value="">All</option>
-            {distinctActionTypes.map((type) => (
+            {ACTION_TYPES.map((type) => (
               <option key={type} value={type}>
                 {type}
               </option>
