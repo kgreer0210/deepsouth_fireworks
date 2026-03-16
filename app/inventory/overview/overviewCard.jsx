@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 export default function OverviewCard({
   title,
   qty,
@@ -5,22 +7,26 @@ export default function OverviewCard({
   qtyDescription,
   valueDescription,
   isCentered = false,
+  Icon,
 }) {
   return isCentered ? (
-    <div className="p-4 bg-white rounded-lg shadow min-w-[300px]">
-      <h1 className="font-bold flex justify-center">{title}</h1>
+    <div className="p-6 bg-white rounded-lg shadow min-w-[300px]">
+      <h3 className="text-sm font-medium text-muted-foreground flex justify-center">{title}</h3>
       <div className="flex justify-center">
-        <p>{qty}</p>
+        <p className="text-2xl font-bold">{qty}</p>
       </div>
       <div className="flex justify-center">
         <p className="text-sm text-gray-500">{qtyDescription}</p>
       </div>
     </div>
   ) : (
-    <div className="p-4 bg-white rounded-lg shadow min-w-[300px]">
-      <h1 className="font-bold">{title}</h1>
+    <div className="p-6 bg-white rounded-lg shadow min-w-[300px]">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
+        {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
+      </div>
       <div className="flex justify-between">
-        <p>{qty}</p>
+        <p className="text-2xl font-bold">{qty}</p>
         <p className="text-left">{value}</p>
       </div>
       <div className="flex justify-between">

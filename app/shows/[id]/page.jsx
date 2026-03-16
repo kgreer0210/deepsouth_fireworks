@@ -38,7 +38,7 @@ export default async function ShowPage({ params }) {
 
   return (
     <div className="flex flex-1 flex-col overflow-y-auto">
-      <h1 className="text-2xl text-center font-bold mt-4">Inventory</h1>
+      <h1 className="text-3xl text-center font-bold mt-4">Show Details</h1>
       <div className="justify-center p-4">
         <IndiviualShow
           show={show}

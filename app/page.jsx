@@ -2,7 +2,6 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import InventoryTable from "@/app/inventory/inventoryTable";
 import Overview from "@/app/inventory/overview/overview";
-import { logout } from "@/app/logout/actions";
 import {
   getTotalInventoryQuantity,
   getTotalInventoryValue,
@@ -27,7 +26,7 @@ export default async function Home() {
 
   return (
     <div className="flex flex-1 flex-col overflow-y-auto">
-      <h1 className="text-2xl text-center font-bold mt-4">Inventory</h1>
+      <h1 className="text-3xl text-center font-bold mt-4">Inventory</h1>
       <div className="flex justify-center p-4">
         <Overview
           totalInventoryQtyData={totalInventoryQtyData}
@@ -39,9 +38,6 @@ export default async function Home() {
       <div className="flex-1 p-4">
         <InventoryTable userRole={userRole} />
       </div>
-      <form action={logout}>
-        <button type="submit">Sign Out</button>
-      </form>
     </div>
   );
 }

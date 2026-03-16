@@ -6,6 +6,7 @@ import { useRealTimeShows } from "./showComponents/useRealTimeShows";
 import { Button } from "@/components/ui/button";
 import AddNewShow from "./showComponents/addNewShow";
 import React from "react";
+import { CalendarDays } from "lucide-react";
 
 export default function ShowsPageClient({ userRole }) {
   const currentDate = new Date();
@@ -39,7 +40,11 @@ export default function ShowsPageClient({ userRole }) {
                 />
               </div>
             ) : (
-              <h2 className="text-2xl font-semibold mb-4">No Upcoming Shows</h2>
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <CalendarDays className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No upcoming shows</h3>
+                <p className="text-sm text-muted-foreground">Shows you schedule will appear here.</p>
+              </div>
             )}
           </TabsContent>
           <TabsContent value="past">
@@ -49,7 +54,11 @@ export default function ShowsPageClient({ userRole }) {
                 <Shows shows={shows} currentDate={currentDate} type="past" />
               </div>
             ) : (
-              <h2 className="text-2xl font-semibold mb-4">No Past Shows</h2>
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <CalendarDays className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">No past shows</h3>
+                <p className="text-sm text-muted-foreground">Shows you schedule will appear here.</p>
+              </div>
             )}
           </TabsContent>
         </Tabs>
