@@ -16,7 +16,7 @@ import { logAction } from "@/app/data/auditLog";
 
 const supabase = createClient();
 
-export function ManageShowInventory({ show, onClose }) {
+export function ManageShowInventory({ show, onClose, userRole }) {
   const [showInventory, setShowInventory] = useState([]);
   const [quantityChanges, setQuantityChanges] = useState({});
   const [isUpdating, setIsUpdating] = useState(false);
@@ -51,6 +51,10 @@ export function ManageShowInventory({ show, onClose }) {
   };
 
   const handleUpdateInventory = async () => {
+    if (userRole !== 'admin') {
+      toast.error('Unauthorized');
+      return;
+    }
     try {
       setIsUpdating(true);
       let hasErrors = false;

@@ -19,6 +19,16 @@ export async function getInventory() {
 export async function deleteInventory(id) {
   const supabase = createClient();
 
+  // Check role before deleting
+  const { data: { user } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
+  if (user) {
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+    if (profile?.role !== 'admin') {
+      console.error('Unauthorized: only admins can delete inventory');
+      return;
+    }
+  }
+
   const { error } = await supabase
     .from("inventory")
     .delete()

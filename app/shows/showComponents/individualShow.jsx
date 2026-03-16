@@ -192,6 +192,10 @@ export default function IndividualShow({
     printWindow.focus();
   }, [show.name]);
   const handleDeleteShow = async () => {
+    if (userRole !== 'admin') {
+      toast.error('Unauthorized');
+      return;
+    }
     setIsDeleting(true);
 
     try {
@@ -302,6 +306,7 @@ export default function IndividualShow({
                   <ManageShowInventory
                     show={show}
                     onClose={handleManageInventoryDialogClose}
+                    userRole={userRole}
                   />
                 </div>
               </DialogContent>

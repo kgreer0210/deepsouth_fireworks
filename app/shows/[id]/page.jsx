@@ -5,6 +5,7 @@ import { createClient } from "@/utils/supabase/server";
 import { getShowInventoryDetails } from "@/app/data/detailedShowInventory";
 import { getInventory } from "@/app/data/inventoryData";
 import { getUserRole } from "@/app/data/userProfile";
+import { redirect } from "next/navigation";
 
 async function getShow(id) {
   const supabase = createClient();
@@ -23,7 +24,8 @@ async function getShow(id) {
 
 export default async function ShowPage({ params }) {
   const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) redirect('/login');
   const userRole = await getUserRole(supabase, user);
 
   const show = await getShow(params.id);
