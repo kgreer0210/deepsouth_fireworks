@@ -153,6 +153,8 @@ export default function IndividualShow({
 
   const printableRef = useRef();
 
+  const budgetPct = showSummary.length > 0 ? (showSummary[0].total_cost / showSummary[0].budget) * 100 : 0;
+
   const handlePrint = useCallback(() => {
     const printContent = printableRef.current;
     const printWindow = window.open("", "_blank");
@@ -274,20 +276,15 @@ export default function IndividualShow({
             {showSummary.length > 0 ? showSummary[0].budget : 0} has been used
           </p>
           {/* Budget bar with color gradient */}
-          {(() => {
-            const budgetPct = showSummary.length > 0 ? (showSummary[0].total_cost / showSummary[0].budget) * 100 : 0;
-            return (
-              <div className="w-full bg-muted rounded-full h-2">
-                <div
-                  className={cn(
-                    "h-2 rounded-full transition-all",
-                    budgetPct < 60 ? "bg-green-500" : budgetPct < 85 ? "bg-yellow-500" : "bg-red-500"
-                  )}
-                  style={{ width: `${Math.min(100, budgetPct)}%` }}
-                />
-              </div>
-            );
-          })()}
+          <div className="w-full bg-muted rounded-full h-2">
+            <div
+              className={cn(
+                "h-2 rounded-full transition-all",
+                budgetPct < 60 ? "bg-green-500" : budgetPct < 85 ? "bg-yellow-500" : "bg-red-500"
+              )}
+              style={{ width: `${Math.min(100, budgetPct)}%` }}
+            />
+          </div>
         </div>
         <div className="flex space-x-4">
           {!isShowInPast() && userRole === 'admin' && (

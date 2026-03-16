@@ -1,5 +1,3 @@
-import { cn } from "@/lib/utils";
-
 export default function OverviewCard({
   title,
   qty,
@@ -16,7 +14,7 @@ export default function OverviewCard({
         <p className="text-2xl font-bold">{qty}</p>
       </div>
       <div className="flex justify-center">
-        <p className="text-sm text-gray-500">{qtyDescription}</p>
+        <p className="text-sm text-muted-foreground">{qtyDescription}</p>
       </div>
     </div>
   ) : (
@@ -30,8 +28,8 @@ export default function OverviewCard({
         <p className="text-left">{value}</p>
       </div>
       <div className="flex justify-between">
-        <p className="text-sm text-gray-500">{qtyDescription}</p>
-        <p className="text-sm text-gray-500">{valueDescription}</p>
+        <p className="text-sm text-muted-foreground">{qtyDescription}</p>
+        <p className="text-sm text-muted-foreground">{valueDescription}</p>
       </div>
     </div>
   );

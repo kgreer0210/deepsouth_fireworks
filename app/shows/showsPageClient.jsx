@@ -57,7 +57,7 @@ export default function ShowsPageClient({ userRole }) {
               <div className="flex flex-col items-center justify-center py-16 text-center">
                 <CalendarDays className="h-12 w-12 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No past shows</h3>
-                <p className="text-sm text-muted-foreground">Shows you schedule will appear here.</p>
+                <p className="text-sm text-muted-foreground">Completed shows will appear here.</p>
               </div>
             )}
           </TabsContent>
