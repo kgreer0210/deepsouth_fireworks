@@ -73,6 +73,7 @@ const AddNewShow = ({ open, setOpen }) => {
 
     if (error) {
       console.error("Error adding show:", error);
+      toast.error(error.message || "Failed to add show");
     } else {
       toast.success("Show added successfully");
       try {

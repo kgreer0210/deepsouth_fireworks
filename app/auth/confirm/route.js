@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
+  const code = searchParams.get("code");
   const token_hash = searchParams.get("token_hash");
   const type = searchParams.get("type");
   const next = searchParams.get("next") ?? "/";
@@ -13,26 +14,31 @@ export async function GET(request) {
   const redirectTo = new URL(destination, request.url);
   const response = NextResponse.redirect(redirectTo);
 
-  if (token_hash && type) {
-    // Create client that writes cookies directly to the response (not next/headers)
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      {
-        cookies: {
-          get(name) {
-            return request.cookies.get(name)?.value;
-          },
-          set(name, value, options) {
-            response.cookies.set({ name, value, ...options });
-          },
-          remove(name, options) {
-            response.cookies.set({ name, value: "", ...options });
-          },
+  // Create client that writes cookies directly to the response (not next/headers)
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        get(name) {
+          return request.cookies.get(name)?.value;
         },
-      }
-    );
+        set(name, value, options) {
+          response.cookies.set({ name, value, ...options });
+        },
+        remove(name, options) {
+          response.cookies.set({ name, value: "", ...options });
+        },
+      },
+    }
+  );
 
+  if (code) {
+    // PKCE flow — exchange code for session
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error) return response;
+  } else if (token_hash && type) {
+    // OTP flow — verify token hash
     const { error } = await supabase.auth.verifyOtp({ type, token_hash });
     if (!error) return response;
   }

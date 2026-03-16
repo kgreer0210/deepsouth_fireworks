@@ -439,9 +439,6 @@ export default function IndividualShow({
           </div>
         )}
       </div>
-      <div className="mt-6 rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-        Crew assignment coming soon
-      </div>
     </div>
   );
 }
