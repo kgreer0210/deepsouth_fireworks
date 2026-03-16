@@ -39,12 +39,15 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [rowSelection, setRowSelection] = React.useState({});
   const [quantityInputs, setQuantityInputs] = React.useState({});
+  const [quantityErrors, setQuantityErrors] = React.useState({});
   const [isProcessing, setIsProcessing] = React.useState(false);
 
-  const handleQuantityChange = (inventoryId, value) => {
-    setQuantityInputs((prev) => ({
+  const handleQuantityChange = (inventoryId, value, availableQty) => {
+    const parsed = Math.max(1, parseInt(value) || 1);
+    setQuantityInputs((prev) => ({ ...prev, [inventoryId]: parsed }));
+    setQuantityErrors((prev) => ({
       ...prev,
-      [inventoryId]: Math.max(1, parseInt(value) || 1),
+      [inventoryId]: parsed > availableQty ? `Max available: ${availableQty}` : null,
     }));
   };
 
@@ -102,7 +105,9 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
       } catch (error) {
         console.error("Error assigning/updating item to show:", error);
         errorCount++;
-        if (
+        if (error.message && error.message.includes("Insufficient inventory")) {
+          toast.error(`Insufficient inventory for ${row.original.name}: ${error.message}`);
+        } else if (
           error.message &&
           error.message.includes("exceed the show's budget")
         ) {
@@ -126,6 +131,7 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
     setIsProcessing(false);
     setRowSelection({});
     setQuantityInputs({});
+    setQuantityErrors({});
 
     // Show a summary toast
     toast(
@@ -156,6 +162,7 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
     meta: {
       quantityInputs,
       handleQuantityChange,
+      quantityErrors,
     },
     initialState: {
       pagination: {
@@ -249,7 +256,13 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
         </div>
         <Button
           onClick={handleAssignSelected}
-          disabled={Object.keys(rowSelection).length === 0 || isProcessing}
+          disabled={
+            Object.keys(rowSelection).length === 0 ||
+            isProcessing ||
+            table.getSelectedRowModel().rows.some(
+              (row) => quantityErrors[row.original.inventory_id]
+            )
+          }
         >
           {isProcessing ? "Processing..." : "Assign Selected to Show"}
         </Button>
