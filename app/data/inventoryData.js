@@ -1,5 +1,6 @@
 // inventoryData.js
 import { createClient } from "@/utils/supabase/client";
+import { logAction } from "@/app/data/auditLog";
 
 export async function getInventory() {
   const supabase = createClient();
@@ -27,4 +28,9 @@ export async function deleteInventory(id) {
     console.error("Error deleting inventory item:", error);
     return;
   }
+
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    await logAction(supabase, user?.id, 'inventory.deleted', { inventory_id: id });
+  } catch (_) {}
 }

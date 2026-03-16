@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { logAction } from "@/app/data/auditLog";
 
 export async function editItemServer(formData, itemId) {
   const name = formData.get("name");
@@ -43,5 +44,14 @@ export async function editItemServer(formData, itemId) {
   if (error) {
     return { success: false, message: "Failed to update item" };
   }
+
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    await logAction(supabase, user?.id, 'inventory.updated', {
+      inventory_id: itemId,
+      fields_changed: { name, category, quantity, price, case_weight: caseWeight, items_per_case: itemsPerCase, duration, container, video_url: videoURL, size, barcode, ex_number: exNumber, notes },
+    });
+  } catch (_) {}
+
   return { success: true, message: "Item updated successfully" };
 }

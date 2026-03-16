@@ -22,6 +22,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
+import { logAction } from "@/app/data/auditLog";
 
 // Define the validation schema using zod
 const formSchema = z.object({
@@ -74,7 +75,13 @@ const AddNewShow = ({ open, setOpen }) => {
       console.error("Error adding show:", error);
     } else {
       toast.success("Show added successfully");
-
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        await logAction(supabase, user?.id, 'show.created', {
+          name: data.name,
+          date_of_show: data.dateOfShow,
+        });
+      } catch (_) {}
       handleClose();
     }
   };

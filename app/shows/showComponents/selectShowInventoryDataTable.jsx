@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
+import { logAction } from "@/app/data/auditLog";
 
 const filterFunction = (row, columnId, value) => {
   const name = row.getValue("name")?.toLowerCase() ?? "";
@@ -59,6 +60,8 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
     let successCount = 0;
     let errorCount = 0;
     let budgetExceededItems = [];
+
+    const { data: { user } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
 
     for (const row of selectedRows) {
       const inventoryId = row.original.inventory_id;
@@ -104,6 +107,14 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
             existingItem ? "updated" : "added"
           } successfully.`
         );
+
+        try {
+          await logAction(supabase, user?.id, existingItem ? 'show_inventory.updated' : 'show_inventory.assigned', {
+            show_id: show.show_id,
+            inventory_id: inventoryId,
+            quantity,
+          });
+        } catch (_) {}
       } catch (error) {
         console.error("Error assigning/updating item to show:", error);
         errorCount++;

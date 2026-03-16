@@ -31,6 +31,7 @@ import { showInventoryColumns } from "./selectShowInventoryColumns";
 import { ManageShowInventory } from "./manageShowInventory";
 import { toast } from "sonner";
 import PrintableShowDetails from "./PrintableShowDetails";
+import { logAction } from "@/app/data/auditLog";
 
 const supabase = createClient();
 
@@ -230,6 +231,14 @@ export default function IndividualShow({
 
       // Navigate back to the shows list or dashboard
       router.push("/shows");
+
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        await logAction(supabase, user?.id, 'show.deleted', {
+          show_id: show.show_id,
+          name: show.name,
+        });
+      } catch (_) {}
     } catch (error) {
       console.error("Error during show deletion:", error);
       toast.error(error.message || "An error occurred during show deletion.");

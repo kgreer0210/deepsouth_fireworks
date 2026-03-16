@@ -25,6 +25,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { createClient } from "@/utils/supabase/client";
+import { logAction } from "@/app/data/auditLog";
 
 // Define the validation schema using zod
 const formSchema = z.object({
@@ -83,6 +84,14 @@ const NewItemForm = ({ open, setOpen, barcodeValue }) => {
       console.error("Error adding item to inventory:", error);
     } else {
       alert("Item added to inventory");
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        await logAction(supabase, user?.id, 'inventory.created', {
+          name: data.name,
+          category: data.category,
+          quantity: data.quantity,
+        });
+      } catch (_) {}
     }
     handleClose();
   };

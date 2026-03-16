@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { toast } from "sonner";
 import { createClient } from "@/utils/supabase/client";
+import { logAction } from "@/app/data/auditLog";
 
 const supabase = createClient();
 
@@ -54,6 +55,8 @@ export function ManageShowInventory({ show, onClose }) {
       setIsUpdating(true);
       let hasErrors = false;
 
+      const { data: { user } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
+
       for (const [inventoryId, newQuantity] of Object.entries(
         quantityChanges
       )) {
@@ -77,6 +80,14 @@ export function ManageShowInventory({ show, onClose }) {
           }
 
           toast.success(`Updated inventory item ${inventoryId}`);
+
+          try {
+            await logAction(supabase, user?.id, newQuantity === 0 ? 'show_inventory.removed' : 'show_inventory.updated', {
+              show_id: show.show_id,
+              inventory_id: parseInt(inventoryId),
+              new_quantity: newQuantity,
+            });
+          } catch (_) {}
         } catch (error) {
           console.error(`Error updating item ${inventoryId}:`, error);
           toast.error(
