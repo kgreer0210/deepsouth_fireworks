@@ -9,13 +9,15 @@ import {
   getUsedYtdQuantity,
   getUsedYtdValue,
 } from "@/app/data/overviewData";
+import { getUserRole } from "@/app/data/userProfile";
 
 export default async function Home() {
   const supabase = createClient();
-  const { data: user, error: userError } = await supabase.auth.getUser();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) {
     redirect("/login");
   }
+  const userRole = await getUserRole(supabase, user);
 
   // Fetch other data as before
   const totalInventoryQtyData = await getTotalInventoryQuantity();
@@ -35,7 +37,7 @@ export default async function Home() {
         />
       </div>
       <div className="flex-1 p-4">
-        <InventoryTable />
+        <InventoryTable userRole={userRole} />
       </div>
       <form action={logout}>
         <button type="submit">Sign Out</button>

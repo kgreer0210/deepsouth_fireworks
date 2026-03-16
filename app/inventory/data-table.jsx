@@ -42,7 +42,7 @@ const filterFunction = (row, columnId, filterValue) => {
   );
 };
 
-export function DataTable({ columns, data, isMainPage = false }) {
+export function DataTable({ columns, data, isMainPage = false, userRole }) {
   const [sorting, setSorting] = React.useState([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [columnVisibility, setColumnVisibility] = React.useState({});
@@ -113,7 +113,7 @@ export function DataTable({ columns, data, isMainPage = false }) {
           </DropdownMenuContent>
         </DropdownMenu>
         <div className="flex-grow"></div>
-        {isMainPage && <AddNewInventoryItem />}
+        {isMainPage && userRole === 'admin' && <AddNewInventoryItem />}
       </div>
 
       <div className="rounded-md border overflow-x-auto">

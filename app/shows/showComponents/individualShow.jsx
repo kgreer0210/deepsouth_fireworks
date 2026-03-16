@@ -40,6 +40,7 @@ export default function IndividualShow({
   initialShowSummary,
   showInventory,
   inventoryData,
+  userRole,
 }) {
   const router = useRouter();
   const [showSummary, setShowSummary] = useState(initialShowSummary);
@@ -277,7 +278,7 @@ export default function IndividualShow({
           />
         </div>
         <div className="flex space-x-4">
-          {!isShowInPast() && (
+          {!isShowInPast() && userRole === 'admin' && (
             <Dialog
               open={manageInventoryDialogOpen}
               onOpenChange={(open) => {
@@ -307,7 +308,7 @@ export default function IndividualShow({
             </Dialog>
           )}
           <Button onClick={handlePrint}>Print</Button>
-          {!isShowInPast() && (
+          {!isShowInPast() && userRole === 'admin' && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive">Delete Show</Button>
@@ -383,7 +384,7 @@ export default function IndividualShow({
           )}
         </div>
         <div className="flex justify-center mt-2">
-          {!isShowInPast() && (
+          {!isShowInPast() && userRole === 'admin' && (
             <Dialog
               open={addItemDialogOpen}
               onOpenChange={setAddItemDialogOpen}

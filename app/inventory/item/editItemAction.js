@@ -3,6 +3,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { logAction } from "@/app/data/auditLog";
+import { getUserRole } from "@/app/data/userProfile";
 
 export async function editItemServer(formData, itemId) {
   const name = formData.get("name");
@@ -20,6 +21,10 @@ export async function editItemServer(formData, itemId) {
   const notes = formData.get("notes");
 
   const supabase = createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const role = await getUserRole(supabase, user);
+  if (role !== 'admin') return { success: false, message: 'Unauthorized' };
+
   const { error } = await supabase
     .from("inventory")
     .update({
