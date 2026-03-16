@@ -2,20 +2,21 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import InventoryTable from "@/app/inventory/inventoryTable";
 import Overview from "@/app/inventory/overview/overview";
-import { logout } from "@/app/logout/actions";
 import {
   getTotalInventoryQuantity,
   getTotalInventoryValue,
   getUsedYtdQuantity,
   getUsedYtdValue,
 } from "@/app/data/overviewData";
+import { getUserRole } from "@/app/data/userProfile";
 
 export default async function Home() {
-  const supabase = createClient();
-  const { data: user, error: userError } = await supabase.auth.getUser();
+  const supabase = await createClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) {
     redirect("/login");
   }
+  const userRole = await getUserRole(supabase, user);
 
   // Fetch other data as before
   const totalInventoryQtyData = await getTotalInventoryQuantity();
@@ -25,7 +26,7 @@ export default async function Home() {
 
   return (
     <div className="flex flex-1 flex-col overflow-y-auto">
-      <h1 className="text-2xl text-center font-bold mt-4">Inventory</h1>
+      <h1 className="text-3xl text-center font-bold mt-4">Inventory</h1>
       <div className="flex justify-center p-4">
         <Overview
           totalInventoryQtyData={totalInventoryQtyData}
@@ -35,11 +36,8 @@ export default async function Home() {
         />
       </div>
       <div className="flex-1 p-4">
-        <InventoryTable />
+        <InventoryTable userRole={userRole} />
       </div>
-      <form action={logout}>
-        <button type="submit">Sign Out</button>
-      </form>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 
 export async function getShows() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: shows, error } = await supabase.from("shows").select("*");
   if (error) {

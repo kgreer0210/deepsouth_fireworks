@@ -2,7 +2,7 @@
 import { createClient } from "@/utils/supabase/server";
 
 export async function getShowSummary(showId) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: showSummary, error } = await supabase
     .from("show_summary")

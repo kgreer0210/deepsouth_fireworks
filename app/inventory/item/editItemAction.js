@@ -2,6 +2,8 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { logAction } from "@/app/data/auditLog";
+import { getUserRole } from "@/app/data/userProfile";
 
 export async function editItemServer(formData, itemId) {
   const name = formData.get("name");
@@ -18,7 +20,11 @@ export async function editItemServer(formData, itemId) {
   const exNumber = formData.get("ex_number");
   const notes = formData.get("notes");
 
-  const supabase = createClient();
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const role = await getUserRole(supabase, user);
+  if (role !== 'admin') return { success: false, message: 'Unauthorized' };
+
   const { error } = await supabase
     .from("inventory")
     .update({
@@ -43,5 +49,14 @@ export async function editItemServer(formData, itemId) {
   if (error) {
     return { success: false, message: "Failed to update item" };
   }
+
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    await logAction(supabase, user?.id, 'inventory.updated', {
+      inventory_id: itemId,
+      fields_changed: { name, category, quantity, price, case_weight: caseWeight, items_per_case: itemsPerCase, duration, container, video_url: videoURL, size, barcode, ex_number: exNumber, notes },
+    });
+  } catch (_) {}
+
   return { success: true, message: "Item updated successfully" };
 }

@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "sonner";
+import { logAction } from "@/app/data/auditLog";
 
 const filterFunction = (row, columnId, value) => {
   const name = row.getValue("name")?.toLowerCase() ?? "";
@@ -39,12 +40,17 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [rowSelection, setRowSelection] = React.useState({});
   const [quantityInputs, setQuantityInputs] = React.useState({});
+  const [quantityErrors, setQuantityErrors] = React.useState({});
   const [isProcessing, setIsProcessing] = React.useState(false);
 
-  const handleQuantityChange = (inventoryId, value) => {
-    setQuantityInputs((prev) => ({
+  const handleQuantityChange = (inventoryId, value, availableQty) => {
+    const parsed = Math.max(1, parseInt(value) || 1);
+    setQuantityInputs((prev) => ({ ...prev, [inventoryId]: parsed }));
+    setQuantityErrors((prev) => ({
       ...prev,
-      [inventoryId]: Math.max(1, parseInt(value) || 1),
+      [inventoryId]: availableQty != null && parsed > availableQty
+        ? `Max available: ${availableQty}`
+        : null,
     }));
   };
 
@@ -54,6 +60,8 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
     let successCount = 0;
     let errorCount = 0;
     let budgetExceededItems = [];
+
+    const { data: { user } } = await supabase.auth.getUser().catch(() => ({ data: { user: null } }));
 
     for (const row of selectedRows) {
       const inventoryId = row.original.inventory_id;
@@ -99,10 +107,20 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
             existingItem ? "updated" : "added"
           } successfully.`
         );
+
+        try {
+          await logAction(supabase, user?.id, existingItem ? 'show_inventory.updated' : 'show_inventory.assigned', {
+            show_id: show.show_id,
+            inventory_id: inventoryId,
+            quantity,
+          });
+        } catch (_) {}
       } catch (error) {
         console.error("Error assigning/updating item to show:", error);
         errorCount++;
-        if (
+        if (error.message && error.message.includes("Insufficient inventory")) {
+          toast.error(`Insufficient inventory for ${row.original.name}: ${error.message}`);
+        } else if (
           error.message &&
           error.message.includes("exceed the show's budget")
         ) {
@@ -126,6 +144,7 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
     setIsProcessing(false);
     setRowSelection({});
     setQuantityInputs({});
+    setQuantityErrors({});
 
     // Show a summary toast
     toast(
@@ -156,6 +175,7 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
     meta: {
       quantityInputs,
       handleQuantityChange,
+      quantityErrors,
     },
     initialState: {
       pagination: {
@@ -249,7 +269,13 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
         </div>
         <Button
           onClick={handleAssignSelected}
-          disabled={Object.keys(rowSelection).length === 0 || isProcessing}
+          disabled={
+            Object.keys(rowSelection).length === 0 ||
+            isProcessing ||
+            table.getSelectedRowModel().rows.some(
+              (row) => quantityErrors[row.original.inventory_id]
+            )
+          }
         >
           {isProcessing ? "Processing..." : "Assign Selected to Show"}
         </Button>

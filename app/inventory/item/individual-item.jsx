@@ -10,9 +10,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { useState } from "react";
 import { editItemServer } from "./editItemAction";
 
-export function IndividualItem({ item }) {
+export function IndividualItem({ item, userRole }) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isReadOnly = userRole !== 'admin';
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -52,7 +53,7 @@ export function IndividualItem({ item }) {
             <Link href="/">
               <ArrowLeftIcon className="h-5 w-5 text-muted-foreground" />
             </Link>
-            <h1 className="text-2xl font-semibold">Edit {item.name}</h1>
+            <h1 className="text-2xl font-semibold">{isReadOnly ? 'View' : 'Edit'} {item.name}</h1>
           </div>
           <Card className="divide-y min-w-[800px]">
             <CardHeader>
@@ -65,6 +66,7 @@ export function IndividualItem({ item }) {
                   <Input
                     name="name"
                     defaultValue={item.name ? item.name : ""}
+                    disabled={isReadOnly}
                   />
                 </div>
                 <div>
@@ -72,6 +74,7 @@ export function IndividualItem({ item }) {
                   <Input
                     name="category"
                     defaultValue={item.category ? item.category : ""}
+                    disabled={isReadOnly}
                   />
                 </div>
                 <div>
@@ -79,6 +82,7 @@ export function IndividualItem({ item }) {
                   <Input
                     name="quantity"
                     defaultValue={item.quantity ? item.quantity : 0}
+                    disabled={isReadOnly}
                   />
                 </div>
                 <div>
@@ -86,6 +90,7 @@ export function IndividualItem({ item }) {
                   <Input
                     name="price"
                     defaultValue={item.price ? item.price : 0}
+                    disabled={isReadOnly}
                   />
                 </div>
                 <div>
@@ -93,6 +98,7 @@ export function IndividualItem({ item }) {
                   <Input
                     name="case_weight"
                     defaultValue={item.case_weight ? item.case_weight : 0}
+                    disabled={isReadOnly}
                   />
                 </div>
                 <div>
@@ -100,6 +106,7 @@ export function IndividualItem({ item }) {
                   <Input
                     name="items_per_case"
                     defaultValue={item.items_per_case ? item.items_per_case : 0}
+                    disabled={isReadOnly}
                   />
                 </div>
                 <div>
@@ -107,6 +114,7 @@ export function IndividualItem({ item }) {
                   <Input
                     name="video_url"
                     defaultValue={item.video_url ? item.video_url : ""}
+                    disabled={isReadOnly}
                   />
                 </div>
                 <div>
@@ -114,6 +122,7 @@ export function IndividualItem({ item }) {
                   <Input
                     name="barcode"
                     defaultValue={item.barcode ? item.barcode : ""}
+                    disabled={isReadOnly}
                   />
                 </div>
                 <div>
@@ -121,6 +130,7 @@ export function IndividualItem({ item }) {
                   <Input
                     name="ex_number"
                     defaultValue={item.ex_number ? item.ex_number : ""}
+                    disabled={isReadOnly}
                   />
                 </div>
                 <div>
@@ -128,17 +138,19 @@ export function IndividualItem({ item }) {
                   <Input
                     name="notes"
                     defaultValue={item.notes ? item.notes : ""}
+                    disabled={isReadOnly}
                   />
                 </div>
                 <div>
                   <Label htmlFor="size">Size</Label>
-                  <Input name="size" defaultValue={item.size ? item.size : 0} />
+                  <Input name="size" defaultValue={item.size ? item.size : 0} disabled={isReadOnly} />
                 </div>
                 <div>
                   <Label htmlFor="duration">Duration</Label>
                   <Input
                     name="duration"
                     defaultValue={item.duration ? item.duration : ""}
+                    disabled={isReadOnly}
                   />
                 </div>
                 <div>
@@ -146,16 +158,19 @@ export function IndividualItem({ item }) {
                   <Input
                     name="container"
                     defaultValue={item.container ? item.container : ""}
+                    disabled={isReadOnly}
                   />
                 </div>
               </div>
               <div className="flex justify-end mt-4 flex-cols-2 gap-2">
                 <Link href="/">
-                  <Button variant="outline">Cancel</Button>
+                  <Button variant="outline">{isReadOnly ? 'Back' : 'Cancel'}</Button>
                 </Link>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Saving..." : "Save"}
-                </Button>
+                {!isReadOnly && (
+                  <Button type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? "Saving..." : "Save"}
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>

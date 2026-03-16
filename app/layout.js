@@ -1,6 +1,7 @@
 import { Roboto as FontSans } from "next/font/google";
 import "./globals.css";
 import Sidebar from "@/components/sidebar";
+import SidebarWrapper from "@/components/sidebar-wrapper";
 import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 
@@ -24,7 +25,9 @@ export default async function RootLayout({ children }) {
         )}
       >
         <div className="flex h-screen">
-          <Sidebar />
+          <SidebarWrapper>
+            <Sidebar />
+          </SidebarWrapper>
           {children}
           <Toaster />
         </div>

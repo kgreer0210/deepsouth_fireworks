@@ -4,6 +4,7 @@ import { ArrowUpDown, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import VideoModal from "@/app/inventory/inventoryComponents/VideoModal";
 
 export const showInventoryColumns = [
@@ -48,16 +49,22 @@ export const showInventoryColumns = [
     header: "Quantity to Add",
     cell: ({ row, table }) => {
       const inventoryId = row.original.inventory_id;
-      // Access quantityInputs and handleQuantityChange from table.options.meta
-      const { quantityInputs, handleQuantityChange } = table.options.meta;
+      const availableQty = row.original.quantity;
+      const { quantityInputs, handleQuantityChange, quantityErrors } = table.options.meta;
+      const error = quantityErrors?.[inventoryId];
       return (
-        <Input
-          type="number"
-          min="1"
-          value={quantityInputs[inventoryId] || 1}
-          onChange={(e) => handleQuantityChange(inventoryId, e.target.value)}
-          className="w-20"
-        />
+        <div className="flex flex-col gap-1">
+          <Input
+            type="number"
+            min="1"
+            value={quantityInputs[inventoryId] || 1}
+            onChange={(e) => handleQuantityChange(inventoryId, e.target.value, availableQty)}
+            className={cn("w-20", error && "border-red-500 focus-visible:ring-red-500")}
+          />
+          {error && (
+            <span className="text-xs text-red-500">{error}</span>
+          )}
+        </div>
       );
     },
   },
