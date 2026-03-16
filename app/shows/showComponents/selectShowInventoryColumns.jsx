@@ -4,6 +4,7 @@ import { ArrowUpDown, Film } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import VideoModal from "@/app/inventory/inventoryComponents/VideoModal";
 
 export const showInventoryColumns = [
@@ -58,7 +59,7 @@ export const showInventoryColumns = [
             min="1"
             value={quantityInputs[inventoryId] || 1}
             onChange={(e) => handleQuantityChange(inventoryId, e.target.value, availableQty)}
-            className={`w-20 ${error ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+            className={cn("w-20", error && "border-red-500 focus-visible:ring-red-500")}
           />
           {error && (
             <span className="text-xs text-red-500">{error}</span>

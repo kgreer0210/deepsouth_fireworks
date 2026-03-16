@@ -47,7 +47,9 @@ export function ShowInventoryDataTable({ columns, data, show, onClose }) {
     setQuantityInputs((prev) => ({ ...prev, [inventoryId]: parsed }));
     setQuantityErrors((prev) => ({
       ...prev,
-      [inventoryId]: parsed > availableQty ? `Max available: ${availableQty}` : null,
+      [inventoryId]: availableQty != null && parsed > availableQty
+        ? `Max available: ${availableQty}`
+        : null,
     }));
   };
 
