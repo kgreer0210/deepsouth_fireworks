@@ -1,6 +1,5 @@
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
-
-import { createClient } from "@/utils/supabase/server";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -8,25 +7,36 @@ export async function GET(request) {
   const type = searchParams.get("type");
   const next = searchParams.get("next") ?? "/";
 
-  const redirectTo = request.nextUrl.clone();
-  redirectTo.pathname = next;
-  redirectTo.searchParams.delete("token_hash");
-  redirectTo.searchParams.delete("type");
+  // For recovery, always go to update-password page regardless of next param
+  const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/";
+  const destination = type === "recovery" ? "/auth/update-password" : safeNext;
+  const redirectTo = new URL(destination, request.url);
+  const response = NextResponse.redirect(redirectTo);
 
   if (token_hash && type) {
-    const supabase = createClient();
+    // Create client that writes cookies directly to the response (not next/headers)
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      {
+        cookies: {
+          get(name) {
+            return request.cookies.get(name)?.value;
+          },
+          set(name, value, options) {
+            response.cookies.set({ name, value, ...options });
+          },
+          remove(name, options) {
+            response.cookies.set({ name, value: "", ...options });
+          },
+        },
+      }
+    );
 
-    const { error } = await supabase.auth.verifyOtp({
-      type,
-      token_hash,
-    });
-    if (!error) {
-      redirectTo.searchParams.delete("next");
-      return NextResponse.redirect(redirectTo);
-    }
+    const { error } = await supabase.auth.verifyOtp({ type, token_hash });
+    if (!error) return response;
   }
 
-  // return the user to an error page with some instructions
-  redirectTo.pathname = "/error";
-  return NextResponse.redirect(redirectTo);
+  // Token invalid/expired → error page
+  return NextResponse.redirect(new URL("/error", request.url));
 }

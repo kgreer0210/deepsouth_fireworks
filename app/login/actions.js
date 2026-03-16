@@ -44,3 +44,15 @@ export async function signup(formData) {
   revalidatePath("/", "layout");
   redirect("/");
 }
+
+export async function resetPassword(formData) {
+  const supabase = createClient();
+  const email = formData.get("email");
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/confirm?type=recovery`,
+  });
+  if (error) {
+    redirect("/error");
+  }
+  redirect("/login?reset=sent");
+}
