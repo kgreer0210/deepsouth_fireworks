@@ -2,7 +2,7 @@
 import { createClient } from "@/utils/supabase/server";
 
 export async function getShowInventoryDetails(showId) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: showInventoryDetails, error } = await supabase
     .from("show_firework_details")

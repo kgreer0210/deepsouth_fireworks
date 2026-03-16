@@ -20,7 +20,7 @@ export async function editItemServer(formData, itemId) {
   const exNumber = formData.get("ex_number");
   const notes = formData.get("notes");
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const role = await getUserRole(supabase, user);
   if (role !== 'admin') return { success: false, message: 'Unauthorized' };

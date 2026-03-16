@@ -1,6 +1,7 @@
 import { login, signup, resetPassword } from "./actions";
 
-export default function LoginPage({ searchParams }) {
+export default async function LoginPage({ searchParams: searchParamsPromise }) {
+  const searchParams = await searchParamsPromise;
   return (
     <div className="flex flex-1 justify-center items-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md">

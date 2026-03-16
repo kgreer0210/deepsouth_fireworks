@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { IndividualItem } from "../individual-item";
 
 async function getIndividualInventory(id) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: inventory, error } = await supabase
     .from("inventory")
@@ -17,12 +17,13 @@ async function getIndividualInventory(id) {
   return inventory;
 }
 export default async function IndividualItemPage({ params }) {
-  const supabase = createClient();
+  const { inventory_id } = await params;
+  const supabase = await createClient();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) redirect('/login');
   const userRole = await getUserRole(supabase, user);
 
-  const item = await getIndividualInventory(params.inventory_id);
+  const item = await getIndividualInventory(inventory_id);
   return (
     <div className="flex flex-1 flex-col overflow-y-auto">
       <IndividualItem item={item[0]} userRole={userRole} />

@@ -11,7 +11,7 @@ import {
 import { getUserRole } from "@/app/data/userProfile";
 
 export default async function Home() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) {
     redirect("/login");

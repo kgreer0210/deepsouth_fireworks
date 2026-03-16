@@ -8,7 +8,7 @@ import { getUserRole } from "@/app/data/userProfile";
 import { redirect } from "next/navigation";
 
 async function getShow(id) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: show, error } = await supabase
     .from("shows")
     .select("*")
@@ -23,14 +23,15 @@ async function getShow(id) {
 }
 
 export default async function ShowPage({ params }) {
-  const supabase = createClient();
+  const { id } = await params;
+  const supabase = await createClient();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) redirect('/login');
   const userRole = await getUserRole(supabase, user);
 
-  const show = await getShow(params.id);
-  const showSummary = await getShowSummary(params.id);
-  const showInventory = await getShowInventoryDetails(params.id);
+  const show = await getShow(id);
+  const showSummary = await getShowSummary(id);
+  const showInventory = await getShowInventoryDetails(id);
   const inventoryData = await getInventory();
   if (!show) {
     return <div>Show not found</div>;

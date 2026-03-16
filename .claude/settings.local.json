@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__supabase__list_tables",
+      "mcp__supabase__execute_sql",
+      "mcp__plugin_context7-plugin_context7__resolve-library-id",
+      "WebSearch",
+      "mcp__supabase__search_docs",
+      "mcp__plugin_context7-plugin_context7__query-docs",
+      "mcp__supabase__get_logs"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "supabase"
+  ]
+}

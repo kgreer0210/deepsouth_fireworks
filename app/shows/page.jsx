@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import ShowsPageClient from './showsPageClient';
 
 export default async function ShowsPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   if (userError || !user) redirect('/login');
   const userRole = await getUserRole(supabase, user);

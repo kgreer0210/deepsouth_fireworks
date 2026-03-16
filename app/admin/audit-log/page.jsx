@@ -24,8 +24,9 @@ const ACTION_TYPES = [
   'show_inventory.removed',
 ];
 
-export default async function AuditLogPage({ searchParams }) {
-  const supabase = createClient();
+export default async function AuditLogPage({ searchParams: searchParamsPromise }) {
+  const searchParams = await searchParamsPromise;
+  const supabase = await createClient();
 
   const {
     data: { user },
