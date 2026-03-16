@@ -28,6 +28,8 @@ import { MixerHorizontalIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import AddNewInventoryItem from "./inventoryComponents/addNewInventoryItem";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { PackageSearch } from "lucide-react";
 
 // Custom filter function to search across multiple columns
 const filterFunction = (row, columnId, filterValue) => {
@@ -42,10 +44,10 @@ const filterFunction = (row, columnId, filterValue) => {
   );
 };
 
-export function DataTable({ columns, data, isMainPage = false }) {
+export function DataTable({ columns, data, isMainPage = false, userRole }) {
   const [sorting, setSorting] = React.useState([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
-  const [columnVisibility, setColumnVisibility] = React.useState({});
+  const [columnVisibility, setColumnVisibility] = React.useState({ barcode: false, ex_number: false, notes: false });
 
   const table = useReactTable({
     data,
@@ -113,7 +115,7 @@ export function DataTable({ columns, data, isMainPage = false }) {
           </DropdownMenuContent>
         </DropdownMenu>
         <div className="flex-grow"></div>
-        {isMainPage && <AddNewInventoryItem />}
+        {isMainPage && userRole === 'admin' && <AddNewInventoryItem />}
       </div>
 
       <div className="rounded-md border overflow-x-auto">
@@ -142,6 +144,7 @@ export function DataTable({ columns, data, isMainPage = false }) {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="hover:bg-muted/50 transition-colors"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
@@ -162,7 +165,10 @@ export function DataTable({ columns, data, isMainPage = false }) {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <PackageSearch className="h-10 w-10 text-muted-foreground mb-3" />
+                    <p className="text-sm text-muted-foreground">No inventory items found.</p>
+                  </div>
                 </TableCell>
               </TableRow>
             )}

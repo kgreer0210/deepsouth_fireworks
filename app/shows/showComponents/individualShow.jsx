@@ -6,7 +6,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -31,6 +31,7 @@ import { showInventoryColumns } from "./selectShowInventoryColumns";
 import { ManageShowInventory } from "./manageShowInventory";
 import { toast } from "sonner";
 import PrintableShowDetails from "./PrintableShowDetails";
+import { logAction } from "@/app/data/auditLog";
 
 const supabase = createClient();
 
@@ -39,6 +40,7 @@ export default function IndividualShow({
   initialShowSummary,
   showInventory,
   inventoryData,
+  userRole,
 }) {
   const router = useRouter();
   const [showSummary, setShowSummary] = useState(initialShowSummary);
@@ -151,6 +153,8 @@ export default function IndividualShow({
 
   const printableRef = useRef();
 
+  const budgetPct = showSummary.length > 0 ? (showSummary[0].total_cost / showSummary[0].budget) * 100 : 0;
+
   const handlePrint = useCallback(() => {
     const printContent = printableRef.current;
     const printWindow = window.open("", "_blank");
@@ -190,6 +194,10 @@ export default function IndividualShow({
     printWindow.focus();
   }, [show.name]);
   const handleDeleteShow = async () => {
+    if (userRole !== 'admin') {
+      toast.error('Unauthorized');
+      return;
+    }
     setIsDeleting(true);
 
     try {
@@ -225,6 +233,15 @@ export default function IndividualShow({
 
       toast.success("Show deleted successfully and inventory updated.");
 
+      // Log action before navigating away
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        await logAction(supabase, user?.id, 'show.deleted', {
+          show_id: show.show_id,
+          name: show.name,
+        });
+      } catch (_) {}
+
       setShowSummary([]);
       setShowInventoryDetails([]);
 
@@ -258,16 +275,19 @@ export default function IndividualShow({
             ${showSummary.length > 0 ? showSummary[0].total_cost : 0} of $
             {showSummary.length > 0 ? showSummary[0].budget : 0} has been used
           </p>
-          <Progress
-            value={
-              showSummary.length > 0
-                ? (showSummary[0].total_cost / showSummary[0].budget) * 100
-                : 0
-            }
-          />
+          {/* Budget bar with color gradient */}
+          <div className="w-full bg-muted rounded-full h-2">
+            <div
+              className={cn(
+                "h-2 rounded-full transition-all",
+                budgetPct < 60 ? "bg-green-500" : budgetPct < 85 ? "bg-yellow-500" : "bg-red-500"
+              )}
+              style={{ width: `${Math.min(100, budgetPct)}%` }}
+            />
+          </div>
         </div>
         <div className="flex space-x-4">
-          {!isShowInPast() && (
+          {!isShowInPast() && userRole === 'admin' && (
             <Dialog
               open={manageInventoryDialogOpen}
               onOpenChange={(open) => {
@@ -291,13 +311,14 @@ export default function IndividualShow({
                   <ManageShowInventory
                     show={show}
                     onClose={handleManageInventoryDialogClose}
+                    userRole={userRole}
                   />
                 </div>
               </DialogContent>
             </Dialog>
           )}
           <Button onClick={handlePrint}>Print</Button>
-          {!isShowInPast() && (
+          {!isShowInPast() && userRole === 'admin' && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive">Delete Show</Button>
@@ -373,7 +394,7 @@ export default function IndividualShow({
           )}
         </div>
         <div className="flex justify-center mt-2">
-          {!isShowInPast() && (
+          {!isShowInPast() && userRole === 'admin' && (
             <Dialog
               open={addItemDialogOpen}
               onOpenChange={setAddItemDialogOpen}

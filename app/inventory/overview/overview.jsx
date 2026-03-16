@@ -1,4 +1,5 @@
 import OverviewCard from "./overviewCard";
+import { Package, TrendingDown } from "lucide-react";
 
 export default function Overview({
   totalInventoryQtyData,
@@ -15,6 +16,7 @@ export default function Overview({
         value={`${totalInventoryValueData}`}
         qtyDescription="Total Quantity"
         valueDescription="Total Value"
+        Icon={Package}
       />
       <OverviewCard
         title="Used YTD"
@@ -22,6 +24,7 @@ export default function Overview({
         value={`$${usedYtdValueData}`}
         qtyDescription="Total Used"
         valueDescription="Total Value"
+        Icon={TrendingDown}
       />
     </div>
   );
