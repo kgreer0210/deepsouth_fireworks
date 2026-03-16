@@ -226,12 +226,7 @@ export default function IndividualShow({
 
       toast.success("Show deleted successfully and inventory updated.");
 
-      setShowSummary([]);
-      setShowInventoryDetails([]);
-
-      // Navigate back to the shows list or dashboard
-      router.push("/shows");
-
+      // Log action before navigating away
       try {
         const { data: { user } } = await supabase.auth.getUser();
         await logAction(supabase, user?.id, 'show.deleted', {
@@ -239,6 +234,12 @@ export default function IndividualShow({
           name: show.name,
         });
       } catch (_) {}
+
+      setShowSummary([]);
+      setShowInventoryDetails([]);
+
+      // Navigate back to the shows list or dashboard
+      router.push("/shows");
     } catch (error) {
       console.error("Error during show deletion:", error);
       toast.error(error.message || "An error occurred during show deletion.");
