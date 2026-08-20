@@ -1,4 +1,4 @@
-import { login, signup, resetPassword } from "./actions";
+import { login, resetPassword } from "./actions";
 
 export default async function LoginPage({ searchParams: searchParamsPromise }) {
   const searchParams = await searchParamsPromise;
@@ -51,13 +51,6 @@ export default async function LoginPage({ searchParams: searchParamsPromise }) {
               formAction={login}
             >
               Log In
-            </button>
-            <button
-              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              type="submit"
-              formAction={signup}
-            >
-              Sign Up
             </button>
           </div>
         </form>

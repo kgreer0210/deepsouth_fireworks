@@ -20,6 +20,7 @@ With these unset, both `next build` (page-data collection) and `next dev` (any r
 - `NEXT_PUBLIC_SUPABASE_URL` — e.g. `https://<project-ref>.supabase.co` (project ref is in `.mcp.json`).
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — the project's publishable anon key.
 - `NEXT_PUBLIC_SITE_URL` — optional; only used by the password-reset redirect in `app/login/actions.js` (defaults are fine for local dev, e.g. `http://localhost:3000`).
+- `SUPABASE_SERVICE_ROLE_KEY` — server-only secret used by `utils/supabase/admin.js` to create Auth users from the admin Users page. Never prefix this with `NEXT_PUBLIC_`. Admin user creation fails at runtime if this is unset; the rest of the app can still run.
 
 These are read from the process environment (injected Cloud Agent secrets) or a local,
 gitignored `.env.local`. `NEXT_PUBLIC_*` values are inlined at build time, so a fresh `next build`
@@ -32,7 +33,9 @@ config in the repo. Linting is not runnable as-scripted; this is a repository is
 environment one.
 
 ### Auth / data notes
-- Login uses Supabase email+password (`signInWithPassword`). Exercising the app end to end
-  requires a valid Supabase project and a test user; unauthenticated requests redirect to `/login`.
+- Login uses Supabase email+password (`signInWithPassword`). There is no public sign-up;
+  admins create users at `/admin/users` via `auth.admin.createUser` (service role).
+- Exercising the app end to end requires a valid Supabase project and a test user;
+  unauthenticated requests redirect to `/login`.
 - Data access uses raw Supabase queries in `app/data/` plus RPC functions
   (`insert_show_inventory`, `update_show_inventory`). Realtime hooks keep tables in sync.
