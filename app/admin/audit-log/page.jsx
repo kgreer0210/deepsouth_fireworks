@@ -22,6 +22,7 @@ const ACTION_TYPES = [
   'show_inventory.assigned',
   'show_inventory.updated',
   'show_inventory.removed',
+  'user.created',
 ];
 
 export default async function AuditLogPage({ searchParams: searchParamsPromise }) {
