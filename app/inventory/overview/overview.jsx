@@ -12,15 +12,15 @@ export default function Overview({
     <div className="flex gap-4">
       <OverviewCard
         title="Total Inventory"
-        qty={totalInventoryQtyData}
-        value={`${totalInventoryValueData}`}
+        qty={Number(totalInventoryQtyData).toLocaleString("en-US")}
+        value={`$${totalInventoryValueData}`}
         qtyDescription="Total Quantity"
         valueDescription="Total Value"
         Icon={Package}
       />
       <OverviewCard
         title="Used YTD"
-        qty={usedYtdQuantityData}
+        qty={Number(usedYtdQuantityData).toLocaleString("en-US")}
         value={`$${usedYtdValueData}`}
         qtyDescription="Total Used"
         valueDescription="Total Value"

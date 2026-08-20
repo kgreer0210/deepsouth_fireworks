@@ -2,12 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import InventoryTable from "@/app/inventory/inventoryTable";
 import Overview from "@/app/inventory/overview/overview";
-import {
-  getTotalInventoryQuantity,
-  getTotalInventoryValue,
-  getUsedYtdQuantity,
-  getUsedYtdValue,
-} from "@/app/data/overviewData";
+import { getOverviewStats } from "@/app/data/overviewData";
 import { getUserRole } from "@/app/data/userProfile";
 
 export default async function Home() {
@@ -18,11 +13,12 @@ export default async function Home() {
   }
   const userRole = await getUserRole(supabase, user);
 
-  // Fetch other data as before
-  const totalInventoryQtyData = await getTotalInventoryQuantity();
-  const totalInventoryValueData = await getTotalInventoryValue();
-  const usedYtdQuantityData = await getUsedYtdQuantity();
-  const usedYtdValueData = await getUsedYtdValue();
+  const {
+    totalInventoryQty: totalInventoryQtyData,
+    totalInventoryValue: totalInventoryValueData,
+    usedYtdQuantity: usedYtdQuantityData,
+    usedYtdValue: usedYtdValueData,
+  } = await getOverviewStats(supabase);
 
   return (
     <div className="flex flex-1 flex-col overflow-y-auto">

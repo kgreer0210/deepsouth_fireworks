@@ -23,9 +23,9 @@ export default function OverviewCard({
         <h3 className="text-sm font-medium text-muted-foreground">{title}</h3>
         {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
       </div>
-      <div className="flex justify-between">
+      <div className="flex justify-between items-baseline">
         <p className="text-2xl font-bold">{qty}</p>
-        <p className="text-left">{value}</p>
+        <p className="text-2xl font-bold text-right">{value}</p>
       </div>
       <div className="flex justify-between">
         <p className="text-sm text-muted-foreground">{qtyDescription}</p>
